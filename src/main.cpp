@@ -495,5 +495,6 @@ void bersihkanMemori()
 void tambahPengeluaran()
 {
   // TODO: Implement add expense functionality
-  int tanggal, barang, kategori, nominal;
+  int tanggal, nominal;
+  char barang[10], kategori[10]; 
 }
