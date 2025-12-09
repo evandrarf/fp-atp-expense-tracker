@@ -4,7 +4,6 @@
 #include <fstream>
 using namespace std;
 
-
 struct List{
   char* tanggal;
   char* deskripsi;
@@ -270,7 +269,42 @@ void editData() {
 }
 
 void hapusData() {
-    // TODO: Implement delete data functionality
+    if (pengeluaran == NULL) {
+        cout << "\n[DATA KOSONG] Tidak ada data yang bisa dihapus.\n";
+        return;
+    }
+
+    int nomorHapus;
+    cout << "\n Masukkan nomor data yang ingin dihapus: ";
+    cin >> nomorHapus;
+
+    struct List* temp = pengeluaran;
+    struct List* prev = NULL;
+
+    int currentIndex = 1;
+    while (temp != NULL && currentIndex < nomorHapus) {
+        prev = temp;
+        temp = temp->next;
+        currentIndex++;
+    }
+
+    if (temp == NULL) {
+        cout << "[Error] Nomor data tidak ditemukan.\n";
+        return;
+    }
+
+    if (prev == NULL) {
+        pengeluaran = temp->next;
+    } else {
+        prev->next = temp->next;
+    }
+
+    delete[] temp->tanggal;
+    delete[] temp->deskripsi;
+    delete[] temp->kategori;
+    delete temp;
+
+    cout << "[Sukses] Data nomor " << nomorHapus << " telah dihapus.\n";
 }
 
 void sortingData() {
