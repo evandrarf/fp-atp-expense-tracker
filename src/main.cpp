@@ -293,6 +293,7 @@ void hapusData() {
         return;
     }
 
+    //Kalau yang dihapus HEAD
     if (prev == NULL) {
         pengeluaran = temp->next;
     } else {
