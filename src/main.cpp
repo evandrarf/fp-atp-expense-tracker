@@ -492,7 +492,9 @@ void bersihkanMemori()
   // TODO: Implement memory cleanup functionality
 }
 
+//SEBASTIAN
 void tambahPengeluaran()
 {
   // TODO: Implement add expense functionality
+  int tanggal_beli, barang, kategori, nominal;
 }
