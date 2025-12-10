@@ -128,9 +128,52 @@ d888b Y8b Y8b    888      888,d88 d8b Y8b  888 88"   "YeeP" 888 888 d,dP   "YeeP
   cout << "======================================================================================================" << endl;
 }
 
-void loadFile()
-{
-  // TODO: Implement file loading functionality
+void loadFile() {
+    ifstream fileCsv("database_keuangan.csv");
+    
+    if (fileCsv.is_open()) {
+        char buffer[500];
+        fileCsv.getline(buffer, 500); 
+
+        while (fileCsv.getline(buffer, 500)) {
+            char *tgl, *desc, *kat, *nomStr, *curStr;
+
+            tgl = strtok(buffer, ";");
+            desc = strtok(NULL, ";");
+            kat = strtok(NULL, ";");
+            nomStr = strtok(NULL, ";");
+            curStr = strtok(NULL, ";");
+
+            if (tgl && desc && kat && nomStr && curStr) {
+                tambahData(tgl, desc, kat, atoll(nomStr), atoi(curStr));
+            }
+        }
+        fileCsv.close();
+        cout << " [System] Data berhasil dimuat dari 'database_keuangan.csv'.\n";
+        return;
+    }
+
+    ifstream fileTxt("database_keuangan.txt");
+    
+    if (fileTxt.is_open()) {
+        char buffer[500];
+        
+        while (fileTxt.getline(buffer, 500)) {
+            char *tgl, *desc, *kat, *nomStr, *curStr;
+
+            tgl = strtok(buffer, "|");
+            desc = strtok(NULL, "|");
+            kat = strtok(NULL, "|");
+            nomStr = strtok(NULL, "|");
+            curStr = strtok(NULL, "|");
+
+            if (tgl && desc && kat && nomStr && curStr) {
+                tambahData(tgl, desc, kat, atoll(nomStr), atoi(curStr));
+            }
+        }
+        fileTxt.close();
+        cout << " [System] Data berhasil dimuat dari 'database_keuangan.txt'.\n";
+    }   
 }
 
 void simpanFile()
