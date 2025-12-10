@@ -35,6 +35,8 @@ void cariData();
 void bersihkanMemori();
 void tambahPengeluaran();
 void groupingPengeluaranKategori();
+void toLowerCase(char* str);
+void toProperCase(char* str);
 
 int main()
 {
@@ -615,13 +617,44 @@ void tambahPengeluaran()
 
 }
 
+void toLowerCase(char* str) {
+    for (int i = 0; str[i]; i++) {
+        if (str[i] >= 'A' && str[i] <= 'Z') {
+            str[i] += 32; // jadi huruf kecil
+        }
+    }
+}
+
+void toProperCase(char* str) {
+    bool startWord = true;
+    for (int i = 0; str[i]; i++) {
+        char c = str[i];
+
+        if (c == ' ' || c == '\t') {
+            startWord = true;
+        } else {
+            if (startWord) {
+                // huruf pertama kata → BESAR
+                if (c >= 'a' && c <= 'z') {
+                    str[i] = c - 32;
+                }
+                startWord = false;
+            } else {
+                // huruf setelahnya → kecil
+                if (c >= 'A' && c <= 'Z') {
+                    str[i] = c + 32;
+                }
+            }
+        }
+    }
+}
+
+
 void groupingPengeluaranKategori()
 {
     showHeader();
     if (pengeluaran == NULL) {
         cout << "\n\t[ DATA KOSONG ]\n\n";
-        cin.ignore();
-        cin.get();
     return;
     }
 
@@ -657,7 +690,4 @@ void groupingPengeluaranKategori()
     }
     cout << "\nKurs yang digunakan: $1 = Rp " << nilaiKursDollar << endl;
     cout << "---------------------------------\n";
-
-    cout << "\nTekan Enter...";
-    cin.ignore(); cin.get();
 }
