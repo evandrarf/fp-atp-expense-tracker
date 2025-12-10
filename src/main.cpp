@@ -34,6 +34,7 @@ void sortingData();
 void cariData();
 void bersihkanMemori();
 void tambahPengeluaran();
+void groupingPengeluaranKategori();
 
 int main()
 {
@@ -51,6 +52,7 @@ int main()
     cout << " [6] Cari Data\n";
     cout << " [7] Simpan & Keluar\n";
     cout << " [8] Atur Kurs Dollar (Saat Ini: Rp " << nilaiKursDollar << ")\n";
+    cout << " [9] Grouping Pengeluaran per Kategori\n";
     cout << " -----------------------------------\n";
     cout << " Pilih Menu: ";
     cin >> pilihan;
@@ -82,6 +84,9 @@ int main()
       return 0;
     case 8:
       aturKurs();
+      break;
+    case 9:
+      groupingPengeluaranKategori();
       break;
     default:
       cout << " Pilihan tidak valid.\n";
@@ -248,6 +253,9 @@ void tampilkanData()
   if (pengeluaran == NULL)
   {
     cout << "\n\t[ DATA KOSONG ]\n\n";
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
     return;
   }
 
@@ -541,4 +549,51 @@ void tambahPengeluaran()
   cout<<"Nominal: ";
   cin>>nominal;
 
+}
+
+void groupingPengeluaranKategori()
+{
+    showHeader();
+    if (pengeluaran == NULL) {
+        cout << "\n\t[ DATA KOSONG ]\n\n";
+        cin.ignore();
+        cin.get();
+    return;
+    }
+
+    char kategoriList[50][30];
+    long long totalKategori[50];
+    int jumlahKategori = 0;
+    struct List* temp = pengeluaran;
+
+    while(temp != NULL){
+        long long NominalInIDR = (temp->currency == 1) ? temp->nominal : temp->nominal * nilaiKursDollar;
+        bool found = false;
+        for(int i = 0; i < jumlahKategori; i++){
+            if(strcmp(kategoriList[i], temp->kategori) == 0){
+                totalKategori[i] += NominalInIDR;
+                found = true;
+                break;
+            }
+        }
+        if(!found){
+            strcpy(kategoriList[jumlahKategori], temp->kategori);
+            totalKategori[jumlahKategori] = NominalInIDR;
+            jumlahKategori++;
+        }
+        temp = temp->next;
+    }
+    cout << "\n--- TOTAL PENGELUARAN PER KATEGORI ---\n";
+    cout << "Semua nominal ditampilkan dalam Rupiah (IDR)\n\n";
+
+    for (int i = 0; i < jumlahKategori; i++){
+        cout << left << setw(20) << kategoriList[i] << ": Rp ";
+        printRupiah(totalKategori[i]);
+        cout << "\n";
+    }
+    cout << "\nKurs yang digunakan: $1 = Rp " << nilaiKursDollar << endl;
+    cout << "---------------------------------\n";
+
+    cout << "\nTekan Enter...";
+    cin.ignore(); cin.get();
 }
