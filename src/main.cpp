@@ -40,6 +40,7 @@ void tambahPengeluaran();
 void groupingPengeluaranKategori();
 void toLowerCase(char *str);
 void toProperCase(char *str);
+void persentaseExpensePerBulan();
 
 // Fungsi untuk Merge Sort Linked List
 struct List *getMiddle(struct List *head);
@@ -66,6 +67,7 @@ int main()
     cout << " [7] Simpan & Keluar\n";
     cout << " [8] Atur Kurs Dollar (Saat Ini: Rp " << nilaiKursDollar << ")\n";
     cout << " [9] Grouping Pengeluaran per Kategori\n";
+    cout << " [10] Persentase Expense per Bulan\n";
     cout << " -----------------------------------\n";
     cout << " Pilih Menu: ";
     cin >> pilihan;
@@ -100,6 +102,9 @@ int main()
       break;
     case 9:
       groupingPengeluaranKategori();
+      break;
+    case 10:
+      persentaseExpensePerBulan();
       break;
     default:
       cout << " Pilihan tidak valid.\n";
@@ -1119,4 +1124,184 @@ void printPotong(const char *teks, int maxLebar)
     }
     cout << "...";
   }
+}
+
+// Fungsi untuk mendapatkan nama bulan dari nomor bulan
+const char *getNamaBulan(int bulan)
+{
+  const char *namaBulan[] = {
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+  if (bulan >= 1 && bulan <= 12)
+  {
+    return namaBulan[bulan - 1];
+  }
+  return "Unknown";
+}
+
+void persentaseExpensePerBulan()
+{
+  showHeader();
+  if (pengeluaran == NULL)
+  {
+    cout << "\n\t[ DATA KOSONG ]\n\n";
+    return;
+  }
+
+  // Struktur untuk menyimpan data per bulan
+  // Format: bulanTahun[i] = bulan * 10000 + tahun (misal: Januari 2025 = 12025)
+  int bulanTahunList[100]; // Daftar kombinasi bulan-tahun unik
+  int jumlahBulanTahun = 0;
+
+  // Kumpulkan semua bulan-tahun unik
+  struct List *temp = pengeluaran;
+  while (temp != NULL)
+  {
+    int day, month, year;
+    sscanf(temp->tanggal, "%d/%d/%d", &day, &month, &year);
+    int bulanTahun = month * 10000 + year;
+
+    // Cek apakah sudah ada di list
+    bool found = false;
+    for (int i = 0; i < jumlahBulanTahun; i++)
+    {
+      if (bulanTahunList[i] == bulanTahun)
+      {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      bulanTahunList[jumlahBulanTahun++] = bulanTahun;
+    }
+    temp = temp->next;
+  }
+
+  // Sort bulanTahunList (bubble sort sederhana)
+  for (int i = 0; i < jumlahBulanTahun - 1; i++)
+  {
+    for (int j = 0; j < jumlahBulanTahun - i - 1; j++)
+    {
+      int year1 = bulanTahunList[j] % 10000;
+      int month1 = bulanTahunList[j] / 10000;
+      int year2 = bulanTahunList[j + 1] % 10000;
+      int month2 = bulanTahunList[j + 1] / 10000;
+
+      if (year1 > year2 || (year1 == year2 && month1 > month2))
+      {
+        int tempVal = bulanTahunList[j];
+        bulanTahunList[j] = bulanTahunList[j + 1];
+        bulanTahunList[j + 1] = tempVal;
+      }
+    }
+  }
+
+  cout << "\n============================================" << endl;
+  cout << "   PERSENTASE EXPENSE PER BULAN & KATEGORI" << endl;
+  cout << "============================================" << endl;
+  cout << "(Semua nominal dalam Rupiah, Kurs $1 = Rp " << nilaiKursDollar << ")\n"
+       << endl;
+
+  // Untuk setiap bulan-tahun, hitung persentase per kategori
+  for (int bt = 0; bt < jumlahBulanTahun; bt++)
+  {
+    int bulan = bulanTahunList[bt] / 10000;
+    int tahun = bulanTahunList[bt] % 10000;
+
+    // Hitung total dan per kategori untuk bulan ini
+    char kategoriList[50][100];
+    long long totalKategori[50] = {0};
+    int jumlahKategori = 0;
+    long long totalBulan = 0;
+
+    temp = pengeluaran;
+    while (temp != NULL)
+    {
+      int day, month, year;
+      sscanf(temp->tanggal, "%d/%d/%d", &day, &month, &year);
+
+      if (month == bulan && year == tahun)
+      {
+        long long nominalIDR = (temp->currency == 1) ? temp->nominal : temp->nominal * nilaiKursDollar;
+        totalBulan += nominalIDR;
+
+        // Cari atau tambah kategori
+        bool found = false;
+        for (int i = 0; i < jumlahKategori; i++)
+        {
+          if (strcmp(kategoriList[i], temp->kategori) == 0)
+          {
+            totalKategori[i] += nominalIDR;
+            found = true;
+            break;
+          }
+        }
+        if (!found)
+        {
+          strcpy(kategoriList[jumlahKategori], temp->kategori);
+          totalKategori[jumlahKategori] = nominalIDR;
+          jumlahKategori++;
+        }
+      }
+      temp = temp->next;
+    }
+
+    // Tampilkan hasil untuk bulan ini
+    cout << "--------------------------------------------" << endl;
+    cout << " " << getNamaBulan(bulan) << " " << tahun << endl;
+    cout << "--------------------------------------------" << endl;
+    cout << " Total: Rp ";
+    printRupiah(totalBulan);
+    cout << "\n"
+         << endl;
+
+    // Sort kategori berdasarkan nominal (descending) untuk tampilan
+    for (int i = 0; i < jumlahKategori - 1; i++)
+    {
+      for (int j = 0; j < jumlahKategori - i - 1; j++)
+      {
+        if (totalKategori[j] < totalKategori[j + 1])
+        {
+          // Swap nominal
+          long long tempNom = totalKategori[j];
+          totalKategori[j] = totalKategori[j + 1];
+          totalKategori[j + 1] = tempNom;
+          // Swap kategori
+          char tempKat[100];
+          strcpy(tempKat, kategoriList[j]);
+          strcpy(kategoriList[j], kategoriList[j + 1]);
+          strcpy(kategoriList[j + 1], tempKat);
+        }
+      }
+    }
+
+    // Tampilkan persentase per kategori
+    cout << left << setw(20) << " Kategori" << right << setw(12) << "Nominal" << setw(10) << "Persen" << endl;
+    cout << " " << string(40, '-') << endl;
+
+    for (int i = 0; i < jumlahKategori; i++)
+    {
+      double persen = (totalBulan > 0) ? ((double)totalKategori[i] / totalBulan) * 100.0 : 0.0;
+
+      cout << " " << left << setw(19) << kategoriList[i];
+      cout << "Rp ";
+      // Tampilkan nominal dengan format
+      cout << right << setw(9);
+      printRupiah(totalKategori[i]);
+      cout << fixed << setprecision(1) << setw(8) << persen << "%";
+
+      // Tampilkan bar visual
+      cout << "  [";
+      int barLen = (int)(persen / 5); // Setiap 5% = 1 karakter
+      for (int b = 0; b < barLen; b++)
+        cout << "#";
+      for (int b = barLen; b < 20; b++)
+        cout << " ";
+      cout << "]" << endl;
+    }
+    cout << endl;
+  }
+
+  cout << "============================================" << endl;
 }
