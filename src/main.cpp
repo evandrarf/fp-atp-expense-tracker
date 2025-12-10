@@ -598,7 +598,117 @@ void sortingData()
 
 void cariData()
 {
-  // TODO: Implement search data functionality
+ if (pengeluaran == NULL) {
+        cout << "\n [DATA KOSONG] Tidak ada yang bisa dicari.\n";
+        return;
+    }
+
+    cin.ignore(); // bersihkan buffer input
+
+    int pilihan;
+    char keyword[200];
+
+    cout << "\n --- MENU PENCARIAN DATA ---\n";
+    cout << " [1] Cari berdasarkan Tanggal\n";
+    cout << " [2] Cari berdasarkan Deskripsi\n";
+    cout << " [3] Cari berdasarkan Kategori\n";
+    cout << " [4] Cari berdasarkan Nominal tepat\n";
+    cout << " [0] Batal\n";
+    cout << " --------------------------------\n";
+    cout << " Pilihan: ";
+    cin >> pilihan;
+
+    if (pilihan == 0) {
+        cout << " Pencarian dibatalkan.\n";
+        return;
+    }
+
+    cin.ignore();
+
+    long long cariNominal = 0;
+
+    if (pilihan >= 1 && pilihan <= 3) {
+        cout << " Masukkan kata kunci: ";
+        cin.getline(keyword, 200);
+
+        // ubah ke lowercase untuk pencarian
+        toLowerCase(keyword);
+    }
+    else if (pilihan == 4) {
+        cout << " Masukkan nominal (angka): ";
+        cin >> cariNominal;
+    }
+    else {
+        cout << " [Error] Pilihan tidak valid.\n";
+        return;
+    }
+
+    cout << "\n --- HASIL PENCARIAN ---\n";
+
+    cout << " ----------------------------------------------------------------------------------------- \n";
+    cout << "| No | " << left << setw(12) << "TANGGAL"
+         << "| " << left << setw(25) << "DESKRIPSI"
+         << "| " << left << setw(10) << "KATEGORI"
+         << "| " << right << setw(18) << "NOMINAL" << " |\n";
+    cout << " ----------------------------------------------------------------------------------------- \n";
+
+    struct List *temp = pengeluaran;
+    int no = 1;
+    bool ditemukan = false;
+
+    while (temp != NULL) {
+        bool match = false;
+
+        // buffer lowercase
+        char lowTanggal[200], lowDeskripsi[200], lowKategori[200];
+
+        strcpy(lowTanggal, temp->tanggal);
+        strcpy(lowDeskripsi, temp->deskripsi);
+        strcpy(lowKategori, temp->kategori);
+
+        toLowerCase(lowTanggal);
+        toLowerCase(lowDeskripsi);
+        toLowerCase(lowKategori);
+
+        // cek sesuai pilihan pencarian
+        if (pilihan == 1 && strstr(lowTanggal, keyword)) match = true;
+        if (pilihan == 2 && strstr(lowDeskripsi, keyword)) match = true;
+        if (pilihan == 3 && strstr(lowKategori, keyword)) match = true;
+        if (pilihan == 4 && temp->nominal == cariNominal) match = true;
+
+        if (match) {
+            ditemukan = true;
+
+            cout << "| " << setw(2) << no << " | "
+                 << left << setw(12) << temp->tanggal
+                 << "| " << left << setw(25) << temp->deskripsi
+                 << "| " << left << setw(10) << temp->kategori
+                 << "| ";
+
+            if (temp->currency == 1) {
+                cout << right << setw(15);
+                printRupiah(temp->nominal);
+                cout << "   |";
+            } else {
+                cout << right << setw(12) << "$ " << temp->nominal << "     |";
+            }
+
+            cout << "\n";
+        }
+
+        temp = temp->next;
+        no++;
+    }
+
+    cout << " ----------------------------------------------------------------------------------------- \n";
+
+    if (!ditemukan) {
+        cout << "\n   [Tidak ada data yang cocok dengan pencarian]\n\n";
+    }
+
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
 }
 
 void bersihkanMemori()
