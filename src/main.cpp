@@ -527,18 +527,39 @@ void bersihkanMemori()
 
 void tambahPengeluaran()
 {
-  // TODO: Implement add expense functionality
-  int tanggal, nominal;
-  char barang[10], kategori[10]; 
+  showHeader();
+    cin.ignore(); // bersihkan buffer agar getline tidak ter-skip
 
-  cout<<"Kategori:  ";
-  cin>>kategori;
-  cout<<"Barang: ";
-  cin>>barang;
-  
-  cout<<"Tanggal pembayaran: ";
-  cin>>tanggal;
-  cout<<"Nominal: ";
-  cin>>nominal;
+    char tgl[50], desc[200], kat[100];
+    long long nominal;
+    int currency;
+
+    cout << "\n --- TAMBAH PENGELUARAN ---\n";
+
+    cout << " Tanggal (DD/MM/YYYY): ";
+    cin.getline(tgl, 50);
+
+    cout << " Deskripsi barang/jasa : ";
+    cin.getline(desc, 200);
+
+    cout << " Kategori              : ";
+    cin.getline(kat, 100);
+
+    cout << " Nominal               : ";
+    cin >> nominal;
+
+    cout << " Mata Uang [1] IDR  [2] USD : ";
+    cin >> currency;
+
+    if (currency != 1 && currency != 2)
+    {
+        cout << " [Error] Input mata uang tidak valid, default = IDR.\n";
+        currency = 1;
+    }
+
+    // Panggil fungsi penambah node
+    tambahData(tgl, desc, kat, nominal, currency);
+
+    cout << "\n [Sukses] Pengeluaran berhasil ditambahkan!\n";
 
 }
