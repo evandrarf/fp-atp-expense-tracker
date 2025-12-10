@@ -83,7 +83,7 @@ int main()
     cout << " [8] Atur Kurs Dollar (Saat Ini: Rp " << nilaiKursDollar << ")\n";
     cout << " [9] Grouping Pengeluaran per Kategori\n";
     cout << " [10] Persentase Expense per Bulan\n";
-    cout << " [11] Bersihkan Memori (Hapus Semua Data di Memori)\n";
+    cout << " [11] Bersihkan Memori\n";
     cout << " [12] Keluar\n";
     cout << " -----------------------------------\n";
     cout << " Pilih Menu: ";
@@ -988,10 +988,8 @@ void cariData()
   char keyword[200];
 
   cout << "\n --- MENU PENCARIAN DATA ---\n";
-  cout << " [1] Cari berdasarkan Tanggal\n";
   cout << " [2] Cari berdasarkan Deskripsi\n";
   cout << " [3] Cari berdasarkan Kategori\n";
-  cout << " [4] Cari berdasarkan Nominal tepat\n";
   cout << " [0] Batal\n";
   cout << " --------------------------------\n";
   cout << " Pilihan: ";
@@ -1007,18 +1005,12 @@ void cariData()
 
   long long cariNominal = 0;
 
-  if (pilihan >= 1 && pilihan <= 3)
+  if (pilihan >= 1 && pilihan <= 2)
   {
     cout << " Masukkan kata kunci: ";
     cin.getline(keyword, 200);
 
-    // ubah ke lowercase untuk pencarian
     toLowerCase(keyword);
-  }
-  else if (pilihan == 4)
-  {
-    cout << " Masukkan nominal (angka): ";
-    cin >> cariNominal;
   }
   else
   {
@@ -1106,7 +1098,60 @@ void cariData()
 
 void bersihkanMemori()
 {
-  // TODO: Implement memory cleanup functionality
+  // 1. Cek dulu apakah data memang ada? Kalau kosong, tidak perlu drama
+  if (pengeluaran == NULL)
+  {
+    cout << "\n [Info] Memori sudah bersih (Data Kosong).\n";
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
+    return;
+  }
+
+  // 2. Tampilkan PERINGATAN KERAS
+  showHeader(); // Opsional, biar header tetap ada
+  cout << "\n ======================================================== \n";
+  cout << "                      !!! PERINGATAN !!!                  \n";
+  cout << " ======================================================== \n";
+
+  cout << " Apakah Anda yakin ingin melanjutkan? (y/n): ";
+
+  char konfirmasi;
+  cin >> konfirmasi;
+
+  if (konfirmasi == 'y' || konfirmasi == 'Y')
+  {
+    struct List *current = pengeluaran;
+    struct List *next = NULL;
+    int jumlahDihapus = 0;
+
+    while (current != NULL)
+    {
+      next = current->next;
+
+      if (current->tanggal != NULL) delete[] current->tanggal;
+      if (current->deskripsi != NULL) delete[] current->deskripsi;
+      if (current->kategori != NULL) delete[] current->kategori;
+
+      delete current;
+
+      current = next;
+      jumlahDihapus++;
+    }
+
+    pengeluaran = NULL;
+    
+    cout << "\n [SUKSES] Memori telah dibersihkan.\n";
+    cout << "          " << jumlahDihapus << " data berhasil dihapus dari memori.\n";
+  }
+  else
+  {
+    cout << "\n [BATAL] Operasi dibatalkan. Data Anda masih aman.\n";
+  }
+
+  cout << "\n Tekan Enter kembali ke menu...";
+  cin.ignore();
+  cin.get();
 }
 
 // ==================== FUNGSI VALIDASI INPUT ====================
@@ -1190,7 +1235,7 @@ bool validateTanggal(const char *tgl, bool checkFuture)
         (year == tahunIni && month > bulanIni) ||
         (year == tahunIni && month == bulanIni && day > hariIni))
     {
-      cout << " [Error] Tanggal tidak boleh lebih dari hari ini! (Expense tracker untuk mencatat pengeluaran yang sudah terjadi)\n";
+      cout << " [Error] Tanggal tidak boleh lebih dari hari ini!\n";
       return false;
     }
   }
