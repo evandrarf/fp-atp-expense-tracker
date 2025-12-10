@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <fstream>
 #include <cstdlib>
+#include <ctime>
 using namespace std;
 
 struct List
@@ -42,6 +43,20 @@ void toLowerCase(char *str);
 void toProperCase(char *str);
 void persentaseExpensePerBulan();
 
+// Fungsi Validasi Input
+bool isLeapYear(int year);
+int getDaysInMonth(int month, int year);
+bool validateTanggal(const char *tgl, bool checkFuture = true);
+bool validateDeskripsi(const char *desc);
+bool validateKategori(const char *kat);
+bool validateNominal(const char *nomStr, long long &nominal);
+void getTanggalHariIni(int &hari, int &bulan, int &tahun);
+bool inputTanggal(char *tgl, int maxLen);
+bool inputDeskripsi(char *desc, int maxLen);
+bool inputKategori(char *kat, int maxLen);
+bool inputNominal(long long &nominal);
+int inputCurrency();
+
 // Fungsi untuk Merge Sort Linked List
 struct List *getMiddle(struct List *head);
 struct List *mergeSortedByNominal(struct List *left, struct List *right, bool ascending);
@@ -64,10 +79,12 @@ int main()
     cout << " [4] Lihat Tabel & Total\n";
     cout << " [5] Urutkan Data (Sort)\n";
     cout << " [6] Cari Data\n";
-    cout << " [7] Simpan & Keluar\n";
+    cout << " [7] Simpan\n";
     cout << " [8] Atur Kurs Dollar (Saat Ini: Rp " << nilaiKursDollar << ")\n";
     cout << " [9] Grouping Pengeluaran per Kategori\n";
     cout << " [10] Persentase Expense per Bulan\n";
+    cout << " [11] Bersihkan Memori (Hapus Semua Data di Memori)\n";
+    cout << " [12] Keluar\n";
     cout << " -----------------------------------\n";
     cout << " Pilih Menu: ";
     cin >> pilihan;
@@ -95,8 +112,7 @@ int main()
       break;
     case 7:
       simpanFile();
-      cout << " Terima kasih! Sampai jumpa.\n";
-      return 0;
+      break;
     case 8:
       aturKurs();
       break;
@@ -106,18 +122,29 @@ int main()
     case 10:
       persentaseExpensePerBulan();
       break;
+    case 11:
+      bersihkanMemori();
+      cout << " Memori dibersihkan. Semua data dihapus dari memori.\n";
+      break;
+    case 12:
+      cout << "Keluar program\n";
+      cout << "Terima kasih telah menggunakan aplikasi ini!\n";
+      return 0;
+      break;
+
     default:
       cout << " Pilihan tidak valid.\n";
     }
 
-    if (pilihan != 4 && pilihan != 6 && pilihan != 7 && pilihan != 5)
+    // if (pilihan != 4 && pilihan != 6 && pilihan != 7 && pilihan != 5 && pilihan != 9 && pilihan != 10)
+    if (pilihan == 1)
     {
       cout << " Tekan Enter...";
       cin.ignore();
       cin.get();
     }
 
-  } while (pilihan != 7);
+  } while (pilihan != 12);
 
   return 0;
 }
@@ -206,6 +233,9 @@ void simpanFile()
   if (pengeluaran == NULL)
   {
     cout << "Data kosong, tidak ada yang perlu disimpan.\n";
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
     return;
   }
 
@@ -411,7 +441,10 @@ void editData()
 {
   if (pengeluaran == NULL)
   {
-    cout << "\n [Error] Data kosong, tidak ada yang bisa diedit.\n";
+    // cout << "\n [Error] Data kosong, tidak ada yang bisa diedit.\n";
+    // cout << " Tekan Enter...";
+    // cin.ignore();
+    // cin.get();
     return;
   }
 
@@ -463,101 +496,194 @@ void editData()
   cin >> pilihan;
   cin.ignore();
 
-  char buffer[100];
+  char buffer[200];
+  long long nominalBaru;
+  int currencyBaru;
 
   switch (pilihan)
   {
   case 1:
   {
-    cout << " Masukkan tanggal baru (DD/MM/YYYY): ";
-    cin.getline(buffer, 100);
-    delete[] temp->tanggal;
-    temp->tanggal = new char[strlen(buffer) + 1];
-    strcpy(temp->tanggal, buffer);
-    cout << " [Sukses] Tanggal berhasil diupdate!\n";
+    // Input tanggal dengan validasi
+    int hariIni, bulanIni, tahunIni;
+    getTanggalHariIni(hariIni, bulanIni, tahunIni);
+    cout << " (Hari ini: " << setfill('0') << setw(2) << hariIni << "/"
+         << setw(2) << bulanIni << "/" << tahunIni << ")\n";
+
+    while (true)
+    {
+      cout << " Masukkan tanggal baru (DD/MM/YYYY): ";
+      cin.getline(buffer, 100);
+      if (validateTanggal(buffer, true))
+      {
+        delete[] temp->tanggal;
+        temp->tanggal = new char[strlen(buffer) + 1];
+        strcpy(temp->tanggal, buffer);
+        cout << " [Sukses] Tanggal berhasil diupdate!\n";
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
+    }
     break;
   }
   case 2:
   {
-    cout << " Masukkan deskripsi baru: ";
-    cin.getline(buffer, 100);
-    delete[] temp->deskripsi;
-    temp->deskripsi = new char[strlen(buffer) + 1];
-    strcpy(temp->deskripsi, buffer);
-    cout << " [Sukses] Deskripsi berhasil diupdate!\n";
+    // Input deskripsi dengan validasi
+    while (true)
+    {
+      cout << " Masukkan deskripsi baru: ";
+      cin.getline(buffer, 200);
+      if (validateDeskripsi(buffer))
+      {
+        delete[] temp->deskripsi;
+        temp->deskripsi = new char[strlen(buffer) + 1];
+        strcpy(temp->deskripsi, buffer);
+        cout << " [Sukses] Deskripsi berhasil diupdate!\n";
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
+    }
     break;
   }
   case 3:
   {
-    cout << " Masukkan kategori baru: ";
-    cin.getline(buffer, 100);
-    delete[] temp->kategori;
-    temp->kategori = new char[strlen(buffer) + 1];
-    strcpy(temp->kategori, buffer);
-    cout << " [Sukses] Kategori berhasil diupdate!\n";
+    // Input kategori dengan validasi
+    while (true)
+    {
+      cout << " Masukkan kategori baru: ";
+      cin.getline(buffer, 100);
+      if (validateKategori(buffer))
+      {
+        toProperCase(buffer);
+        delete[] temp->kategori;
+        temp->kategori = new char[strlen(buffer) + 1];
+        strcpy(temp->kategori, buffer);
+        cout << " [Sukses] Kategori berhasil diupdate!\n";
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
+    }
     break;
   }
   case 4:
   {
-    long long nominalBaru;
-    cout << " Masukkan nominal baru: ";
-    cin >> nominalBaru;
-    temp->nominal = nominalBaru;
-    cout << " [Sukses] Nominal berhasil diupdate!\n";
+    // Input nominal dengan validasi
+    char nomStr[50];
+    while (true)
+    {
+      cout << " Masukkan nominal baru: ";
+      cin.getline(nomStr, 50);
+      if (validateNominal(nomStr, nominalBaru))
+      {
+        temp->nominal = nominalBaru;
+        cout << " [Sukses] Nominal berhasil diupdate!\n";
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
+    }
     break;
   }
   case 5:
   {
-    int currencyBaru;
-    cout << " Pilih mata uang baru [1] IDR [2] USD: ";
-    cin >> currencyBaru;
-    if (currencyBaru == 1 || currencyBaru == 2)
+    // Input currency dengan validasi
+    char input[10];
+    while (true)
     {
-      temp->currency = currencyBaru;
-      cout << " [Sukses] Mata uang berhasil diupdate!\n";
-    }
-    else
-    {
-      cout << " [Error] Pilihan mata uang tidak valid.\n";
+      cout << " Pilih mata uang baru [1] IDR [2] USD: ";
+      cin.getline(input, 10);
+      if (strlen(input) == 1 && (input[0] == '1' || input[0] == '2'))
+      {
+        temp->currency = input[0] - '0';
+        cout << " [Sukses] Mata uang berhasil diupdate!\n";
+        break;
+      }
+      cout << " [Error] Pilihan mata uang tidak valid! Masukkan 1 atau 2.\n";
+      cout << " Silakan coba lagi.\n";
     }
     break;
   }
   case 6:
   {
-    // Edit semua field
-    cout << " Masukkan tanggal baru (DD/MM/YYYY): ";
-    cin.getline(buffer, 100);
-    delete[] temp->tanggal;
-    temp->tanggal = new char[strlen(buffer) + 1];
-    strcpy(temp->tanggal, buffer);
+    // Edit semua field dengan validasi
 
-    cout << " Masukkan deskripsi baru: ";
-    cin.getline(buffer, 100);
-    delete[] temp->deskripsi;
-    temp->deskripsi = new char[strlen(buffer) + 1];
-    strcpy(temp->deskripsi, buffer);
+    // Tanggal
+    int hariIni, bulanIni, tahunIni;
+    getTanggalHariIni(hariIni, bulanIni, tahunIni);
+    cout << " (Hari ini: " << setfill('0') << setw(2) << hariIni << "/"
+         << setw(2) << bulanIni << "/" << tahunIni << ")\n";
 
-    cout << " Masukkan kategori baru: ";
-    cin.getline(buffer, 100);
-    delete[] temp->kategori;
-    temp->kategori = new char[strlen(buffer) + 1];
-    strcpy(temp->kategori, buffer);
-
-    long long nominalBaru;
-    cout << " Masukkan nominal baru: ";
-    cin >> nominalBaru;
-    temp->nominal = nominalBaru;
-
-    int currencyBaru;
-    cout << " Pilih mata uang [1] IDR [2] USD: ";
-    cin >> currencyBaru;
-    if (currencyBaru == 1 || currencyBaru == 2)
+    while (true)
     {
-      temp->currency = currencyBaru;
+      cout << " Masukkan tanggal baru (DD/MM/YYYY): ";
+      cin.getline(buffer, 100);
+      if (validateTanggal(buffer, true))
+      {
+        delete[] temp->tanggal;
+        temp->tanggal = new char[strlen(buffer) + 1];
+        strcpy(temp->tanggal, buffer);
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
     }
-    else
+
+    // Deskripsi
+    while (true)
     {
-      cout << " [Warning] Mata uang tidak valid, tetap menggunakan nilai sebelumnya.\n";
+      cout << " Masukkan deskripsi baru: ";
+      cin.getline(buffer, 200);
+      if (validateDeskripsi(buffer))
+      {
+        delete[] temp->deskripsi;
+        temp->deskripsi = new char[strlen(buffer) + 1];
+        strcpy(temp->deskripsi, buffer);
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
+    }
+
+    // Kategori
+    while (true)
+    {
+      cout << " Masukkan kategori baru: ";
+      cin.getline(buffer, 100);
+      if (validateKategori(buffer))
+      {
+        toProperCase(buffer);
+        delete[] temp->kategori;
+        temp->kategori = new char[strlen(buffer) + 1];
+        strcpy(temp->kategori, buffer);
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
+    }
+
+    // Nominal
+    char nomStr[50];
+    while (true)
+    {
+      cout << " Masukkan nominal baru: ";
+      cin.getline(nomStr, 50);
+      if (validateNominal(nomStr, nominalBaru))
+      {
+        temp->nominal = nominalBaru;
+        break;
+      }
+      cout << " Silakan coba lagi.\n";
+    }
+
+    // Currency
+    char input[10];
+    while (true)
+    {
+      cout << " Pilih mata uang [1] IDR [2] USD: ";
+      cin.getline(input, 10);
+      if (strlen(input) == 1 && (input[0] == '1' || input[0] == '2'))
+      {
+        temp->currency = input[0] - '0';
+        break;
+      }
+      cout << " [Error] Pilihan mata uang tidak valid! Masukkan 1 atau 2.\n";
+      cout << " Silakan coba lagi.\n";
     }
 
     cout << " [Sukses] Semua data berhasil diupdate!\n";
@@ -575,7 +701,10 @@ void hapusData()
 {
   if (pengeluaran == NULL)
   {
-    cout << "\n[DATA KOSONG] Tidak ada data yang bisa dihapus.\n";
+    // cout << "\n[DATA KOSONG] Tidak ada data yang bisa dihapus.\n";
+    // cout << " Tekan Enter...";
+    // cin.ignore();
+    // cin.get();
     return;
   }
 
@@ -623,6 +752,9 @@ void sortingData()
   if (pengeluaran == NULL)
   {
     cout << "\n\t[ DATA KOSONG ]\n\n";
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
     return;
   }
 
@@ -844,6 +976,9 @@ void cariData()
   if (pengeluaran == NULL)
   {
     cout << "\n [DATA KOSONG] Tidak ada yang bisa dicari.\n";
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
     return;
   }
 
@@ -974,6 +1109,267 @@ void bersihkanMemori()
   // TODO: Implement memory cleanup functionality
 }
 
+// ==================== FUNGSI VALIDASI INPUT ====================
+
+// Cek apakah tahun kabisat
+bool isLeapYear(int year)
+{
+  return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+// Mendapatkan jumlah hari dalam bulan tertentu
+int getDaysInMonth(int month, int year)
+{
+  int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  if (month == 2 && isLeapYear(year))
+  {
+    return 29;
+  }
+  return daysInMonth[month - 1];
+}
+
+// Mendapatkan tanggal hari ini
+void getTanggalHariIni(int &hari, int &bulan, int &tahun)
+{
+  time_t now = time(0);
+  tm *ltm = localtime(&now);
+  hari = ltm->tm_mday;
+  bulan = ltm->tm_mon + 1;
+  tahun = 1900 + ltm->tm_year;
+}
+
+// Validasi format dan nilai tanggal
+// checkFuture = true -> tidak boleh lebih dari hari ini
+bool validateTanggal(const char *tgl, bool checkFuture)
+{
+  if (tgl == NULL || strlen(tgl) == 0)
+  {
+    cout << " [Error] Tanggal tidak boleh kosong!\n";
+    return false;
+  }
+
+  int day, month, year;
+  int count = sscanf(tgl, "%d/%d/%d", &day, &month, &year);
+
+  // Cek apakah format valid (harus ada 3 angka)
+  if (count != 3)
+  {
+    cout << " [Error] Format tanggal tidak valid! Gunakan format DD/MM/YYYY\n";
+    return false;
+  }
+
+  // Validasi tahun (minimal 2000, maksimal tahun sekarang + 1)
+  int hariIni, bulanIni, tahunIni;
+  getTanggalHariIni(hariIni, bulanIni, tahunIni);
+
+  if (year < 2000 || year > tahunIni + 1)
+  {
+    cout << " [Error] Tahun tidak valid! (2000 - " << tahunIni << ")\n";
+    return false;
+  }
+
+  // Validasi bulan
+  if (month < 1 || month > 12)
+  {
+    cout << " [Error] Bulan tidak valid! (1-12)\n";
+    return false;
+  }
+
+  // Validasi hari berdasarkan bulan
+  int maxDay = getDaysInMonth(month, year);
+  if (day < 1 || day > maxDay)
+  {
+    cout << " [Error] Hari tidak valid untuk bulan " << month << "! (1-" << maxDay << ")\n";
+    return false;
+  }
+
+  // Cek apakah tanggal di masa depan
+  if (checkFuture)
+  {
+    if (year > tahunIni ||
+        (year == tahunIni && month > bulanIni) ||
+        (year == tahunIni && month == bulanIni && day > hariIni))
+    {
+      cout << " [Error] Tanggal tidak boleh lebih dari hari ini! (Expense tracker untuk mencatat pengeluaran yang sudah terjadi)\n";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// Validasi deskripsi
+bool validateDeskripsi(const char *desc)
+{
+  if (desc == NULL || strlen(desc) == 0)
+  {
+    cout << " [Error] Deskripsi tidak boleh kosong!\n";
+    return false;
+  }
+  if (strlen(desc) < 3)
+  {
+    cout << " [Error] Deskripsi minimal 3 karakter!\n";
+    return false;
+  }
+  if (strlen(desc) > 100)
+  {
+    cout << " [Error] Deskripsi maksimal 100 karakter!\n";
+    return false;
+  }
+  return true;
+}
+
+// Validasi kategori
+bool validateKategori(const char *kat)
+{
+  if (kat == NULL || strlen(kat) == 0)
+  {
+    cout << " [Error] Kategori tidak boleh kosong!\n";
+    return false;
+  }
+  if (strlen(kat) < 2)
+  {
+    cout << " [Error] Kategori minimal 2 karakter!\n";
+    return false;
+  }
+  if (strlen(kat) > 50)
+  {
+    cout << " [Error] Kategori maksimal 50 karakter!\n";
+    return false;
+  }
+  return true;
+}
+
+// Validasi nominal dari string
+bool validateNominal(const char *nomStr, long long &nominal)
+{
+  if (nomStr == NULL || strlen(nomStr) == 0)
+  {
+    cout << " [Error] Nominal tidak boleh kosong!\n";
+    return false;
+  }
+
+  // Cek apakah semua karakter adalah digit
+  for (int i = 0; nomStr[i]; i++)
+  {
+    if (nomStr[i] < '0' || nomStr[i] > '9')
+    {
+      cout << " [Error] Nominal harus berupa angka positif!\n";
+      return false;
+    }
+  }
+
+  nominal = atoll(nomStr);
+
+  if (nominal <= 0)
+  {
+    cout << " [Error] Nominal harus lebih dari 0!\n";
+    return false;
+  }
+
+  if (nominal > 999999999999LL)
+  {
+    cout << " [Error] Nominal terlalu besar! Maksimal 999.999.999.999\n";
+    return false;
+  }
+
+  return true;
+}
+
+// Input tanggal dengan validasi
+bool inputTanggal(char *tgl, int maxLen)
+{
+  int hariIni, bulanIni, tahunIni;
+  getTanggalHariIni(hariIni, bulanIni, tahunIni);
+
+  cout << " (Hari ini: " << setfill('0') << setw(2) << hariIni << "/"
+       << setw(2) << bulanIni << "/" << tahunIni << ")\n";
+
+  while (true)
+  {
+    cout << " Tanggal (DD/MM/YYYY)  : ";
+    cin.getline(tgl, maxLen);
+
+    if (validateTanggal(tgl, true))
+    {
+      return true;
+    }
+    cout << " Silakan coba lagi.\n";
+  }
+}
+
+// Input deskripsi dengan validasi
+bool inputDeskripsi(char *desc, int maxLen)
+{
+  while (true)
+  {
+    cout << " Deskripsi             : ";
+    cin.getline(desc, maxLen);
+
+    if (validateDeskripsi(desc))
+    {
+      return true;
+    }
+    cout << " Silakan coba lagi.\n";
+  }
+}
+
+// Input kategori dengan validasi
+bool inputKategori(char *kat, int maxLen)
+{
+  while (true)
+  {
+    cout << " Kategori              : ";
+    cin.getline(kat, maxLen);
+
+    if (validateKategori(kat))
+    {
+      toProperCase(kat);
+      return true;
+    }
+    cout << " Silakan coba lagi.\n";
+  }
+}
+
+// Input nominal dengan validasi
+bool inputNominal(long long &nominal)
+{
+  char nomStr[50];
+  while (true)
+  {
+    cout << " Nominal               : ";
+    cin.getline(nomStr, 50);
+
+    if (validateNominal(nomStr, nominal))
+    {
+      return true;
+    }
+    cout << " Silakan coba lagi.\n";
+  }
+}
+
+// Input currency dengan validasi
+int inputCurrency()
+{
+  char input[10];
+  int currency;
+  while (true)
+  {
+    cout << " Mata Uang [1] IDR [2] USD: ";
+    cin.getline(input, 10);
+
+    if (strlen(input) == 1 && (input[0] == '1' || input[0] == '2'))
+    {
+      currency = input[0] - '0';
+      return currency;
+    }
+    cout << " [Error] Pilihan mata uang tidak valid! Masukkan 1 atau 2.\n";
+    cout << " Silakan coba lagi.\n";
+  }
+}
+
+// ==================== END FUNGSI VALIDASI ====================
+
 void tambahPengeluaran()
 {
   showHeader();
@@ -985,30 +1381,13 @@ void tambahPengeluaran()
 
   cout << "\n --- TAMBAH PENGELUARAN ---\n";
 
-  cout << " Tanggal (DD/MM/YYYY): ";
-  cin.getline(tgl, 50);
+  // Input dengan validasi
+  inputTanggal(tgl, 50);
+  inputDeskripsi(desc, 200);
+  inputKategori(kat, 100);
+  inputNominal(nominal);
+  currency = inputCurrency();
 
-  cout << " Deskripsi             : ";
-  cin.getline(desc, 200);
-
-  cout << " Kategori              : ";
-  cin.getline(kat, 100);
-
-  toProperCase(kat);
-
-  cout << " Nominal               : ";
-  cin >> nominal;
-
-  do
-  {
-    cout << " Mata Uang [1] IDR  [2] USD : ";
-    cin >> currency;
-
-    if (currency != 1 && currency != 2)
-    {
-      cout << " [Error] Pilihan mata uang tidak valid. Silakan coba lagi.\n";
-    }
-  } while (currency != 1 && currency != 2);
   // Panggil fungsi penambah node
   tambahData(tgl, desc, kat, nominal, currency);
 
@@ -1066,6 +1445,9 @@ void groupingPengeluaranKategori()
   if (pengeluaran == NULL)
   {
     cout << "\n\t[ DATA KOSONG ]\n\n";
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
     return;
   }
 
@@ -1145,6 +1527,9 @@ void persentaseExpensePerBulan()
   if (pengeluaran == NULL)
   {
     cout << "\n\t[ DATA KOSONG ]\n\n";
+    cout << " Tekan Enter...";
+    cin.ignore();
+    cin.get();
     return;
   }
 
