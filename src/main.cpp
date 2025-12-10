@@ -5,10 +5,11 @@
 #include <cstdlib>
 using namespace std;
 
-struct List{
-  char* tanggal;
-  char* deskripsi;
-  char* kategori;
+struct List
+{
+  char *tanggal;
+  char *deskripsi;
+  char *kategori;
   long long nominal;
   int currency; // 1: IDR, 2:USD
   struct List *next;
@@ -22,7 +23,7 @@ long long nilaiKursDollar = 16000; // nilai tukar awal
 void showHeader();
 void printRupiah(long long amount);
 void aturKurs();
-void printPotong(const char* teks, int maxLebar);
+void printPotong(const char *teks, int maxLebar);
 
 // BUAT FILE MANAGEMENT
 void loadFile();
@@ -37,16 +38,16 @@ void cariData();
 void bersihkanMemori();
 void tambahPengeluaran();
 void groupingPengeluaranKategori();
-void toLowerCase(char* str);
-void toProperCase(char* str);
+void toLowerCase(char *str);
+void toProperCase(char *str);
 
 // Fungsi untuk Merge Sort Linked List
-struct List* getMiddle(struct List* head);
-struct List* mergeSortedByNominal(struct List* left, struct List* right, bool ascending);
-struct List* mergeSortedByTanggal(struct List* left, struct List* right, bool ascending);
-struct List* mergeSortByNominal(struct List* head, bool ascending);
-struct List* mergeSortByTanggal(struct List* head, bool ascending);
-int compareTanggal(const char* tgl1, const char* tgl2);
+struct List *getMiddle(struct List *head);
+struct List *mergeSortedByNominal(struct List *left, struct List *right, bool ascending);
+struct List *mergeSortedByTanggal(struct List *left, struct List *right, bool ascending);
+struct List *mergeSortByNominal(struct List *head, bool ascending);
+struct List *mergeSortByTanggal(struct List *head, bool ascending);
+int compareTanggal(const char *tgl1, const char *tgl2);
 
 int main()
 {
@@ -104,7 +105,7 @@ int main()
       cout << " Pilihan tidak valid.\n";
     }
 
-    if (pilihan != 4 && pilihan != 6 && pilihan != 7)
+    if (pilihan != 4 && pilihan != 6 && pilihan != 7 && pilihan != 5)
     {
       cout << " Tekan Enter...";
       cin.ignore();
@@ -140,52 +141,59 @@ d888b Y8b Y8b    888      888,d88 d8b Y8b  888 88"   "YeeP" 888 888 d,dP   "YeeP
   cout << "======================================================================================================" << endl;
 }
 
-void loadFile() {
-    ifstream fileCsv("database_keuangan.csv");
-    
-    if (fileCsv.is_open()) {
-        char buffer[500];
-        fileCsv.getline(buffer, 500); 
+void loadFile()
+{
+  ifstream fileCsv("database_keuangan.csv");
 
-        while (fileCsv.getline(buffer, 500)) {
-            char *tgl, *desc, *kat, *nomStr, *curStr;
+  if (fileCsv.is_open())
+  {
+    char buffer[500];
+    fileCsv.getline(buffer, 500);
 
-            tgl = strtok(buffer, ";");
-            desc = strtok(NULL, ";");
-            kat = strtok(NULL, ";");
-            nomStr = strtok(NULL, ";");
-            curStr = strtok(NULL, ";");
+    while (fileCsv.getline(buffer, 500))
+    {
+      char *tgl, *desc, *kat, *nomStr, *curStr;
 
-            if (tgl && desc && kat && nomStr && curStr) {
-                tambahData(tgl, desc, kat, atoll(nomStr), atoi(curStr));
-            }
-        }
-        fileCsv.close();
-        cout << " [System] Data berhasil dimuat dari 'database_keuangan.csv'.\n";
-        return;
+      tgl = strtok(buffer, ";");
+      desc = strtok(NULL, ";");
+      kat = strtok(NULL, ";");
+      nomStr = strtok(NULL, ";");
+      curStr = strtok(NULL, ";");
+
+      if (tgl && desc && kat && nomStr && curStr)
+      {
+        tambahData(tgl, desc, kat, atoll(nomStr), atoi(curStr));
+      }
     }
+    fileCsv.close();
+    cout << " [System] Data berhasil dimuat dari 'database_keuangan.csv'.\n";
+    return;
+  }
 
-    ifstream fileTxt("database_keuangan.txt");
-    
-    if (fileTxt.is_open()) {
-        char buffer[500];
-        
-        while (fileTxt.getline(buffer, 500)) {
-            char *tgl, *desc, *kat, *nomStr, *curStr;
+  ifstream fileTxt("database_keuangan.txt");
 
-            tgl = strtok(buffer, "|");
-            desc = strtok(NULL, "|");
-            kat = strtok(NULL, "|");
-            nomStr = strtok(NULL, "|");
-            curStr = strtok(NULL, "|");
+  if (fileTxt.is_open())
+  {
+    char buffer[500];
 
-            if (tgl && desc && kat && nomStr && curStr) {
-                tambahData(tgl, desc, kat, atoll(nomStr), atoi(curStr));
-            }
-        }
-        fileTxt.close();
-        cout << " [System] Data berhasil dimuat dari 'database_keuangan.txt'.\n";
-    }   
+    while (fileTxt.getline(buffer, 500))
+    {
+      char *tgl, *desc, *kat, *nomStr, *curStr;
+
+      tgl = strtok(buffer, "|");
+      desc = strtok(NULL, "|");
+      kat = strtok(NULL, "|");
+      nomStr = strtok(NULL, "|");
+      curStr = strtok(NULL, "|");
+
+      if (tgl && desc && kat && nomStr && curStr)
+      {
+        tambahData(tgl, desc, kat, atoll(nomStr), atoi(curStr));
+      }
+    }
+    fileTxt.close();
+    cout << " [System] Data berhasil dimuat dari 'database_keuangan.txt'.\n";
+  }
 }
 
 void simpanFile()
@@ -312,7 +320,7 @@ void printRupiah(long long amount)
   else
   {
     printRupiah(amount / 1000);
-    cout << "." << setfill('0') << setw(3) << (amount % 1000);  
+    cout << "." << setfill('0') << setw(3) << (amount % 1000);
     cout << setfill(' ');
   }
 }
@@ -558,49 +566,57 @@ void editData()
   }
 }
 
-void hapusData() {
-    if (pengeluaran == NULL) {
-        cout << "\n[DATA KOSONG] Tidak ada data yang bisa dihapus.\n";
-        return;
-    }
+void hapusData()
+{
+  if (pengeluaran == NULL)
+  {
+    cout << "\n[DATA KOSONG] Tidak ada data yang bisa dihapus.\n";
+    return;
+  }
 
-    int nomorHapus;
-    cout << "\n Masukkan nomor data yang ingin dihapus: ";
-    cin >> nomorHapus;
+  int nomorHapus;
+  cout << "\n Masukkan nomor data yang ingin dihapus: ";
+  cin >> nomorHapus;
 
-    struct List* temp = pengeluaran;
-    struct List* prev = NULL;
+  struct List *temp = pengeluaran;
+  struct List *prev = NULL;
 
-    int currentIndex = 1;
-    while (temp != NULL && currentIndex < nomorHapus) {
-        prev = temp;
-        temp = temp->next;
-        currentIndex++;
-    }
+  int currentIndex = 1;
+  while (temp != NULL && currentIndex < nomorHapus)
+  {
+    prev = temp;
+    temp = temp->next;
+    currentIndex++;
+  }
 
-    if (temp == NULL) {
-        cout << "[Error] Nomor data tidak ditemukan.\n";
-        return;
-    }
+  if (temp == NULL)
+  {
+    cout << "[Error] Nomor data tidak ditemukan.\n";
+    return;
+  }
 
-    //Kalau yang dihapus HEAD
-    if (prev == NULL) {
-        pengeluaran = temp->next;
-    } else {
-        prev->next = temp->next;
-    }
+  // Kalau yang dihapus HEAD
+  if (prev == NULL)
+  {
+    pengeluaran = temp->next;
+  }
+  else
+  {
+    prev->next = temp->next;
+  }
 
-    delete[] temp->tanggal;
-    delete[] temp->deskripsi;
-    delete[] temp->kategori;
-    delete temp;
+  delete[] temp->tanggal;
+  delete[] temp->deskripsi;
+  delete[] temp->kategori;
+  delete temp;
 
-    cout << "[Sukses] Data nomor " << nomorHapus << " telah dihapus.\n";
+  cout << "[Sukses] Data nomor " << nomorHapus << " telah dihapus.\n";
 }
 
 void sortingData()
 {
-  if (pengeluaran == NULL) {
+  if (pengeluaran == NULL)
+  {
     cout << "\n\t[ DATA KOSONG ]\n\n";
     return;
   }
@@ -615,12 +631,14 @@ void sortingData()
   cout << " Pilihanmu: ";
   cin >> pilihan;
 
-  if (pilihan == 0) {
+  if (pilihan == 0)
+  {
     cout << " Sorting dibatalkan.\n";
     return;
   }
 
-  if (pilihan != 1 && pilihan != 2) {
+  if (pilihan != 1 && pilihan != 2)
+  {
     cout << " [Error] Pilihan tidak valid.\n";
     return;
   }
@@ -634,11 +652,14 @@ void sortingData()
 
   bool ascending = (urutan == 1);
 
-  if (pilihan == 1) {
+  if (pilihan == 1)
+  {
     // Sort by Nominal
     pengeluaran = mergeSortByNominal(pengeluaran, ascending);
     cout << "\n [Sukses] Data berhasil diurutkan berdasarkan Nominal!\n";
-  } else if (pilihan == 2) {
+  }
+  else if (pilihan == 2)
+  {
     // Sort by Tanggal
     pengeluaran = mergeSortByTanggal(pengeluaran, ascending);
     cout << "\n [Sukses] Data berhasil diurutkan berdasarkan Tanggal!\n";
@@ -649,15 +670,19 @@ void sortingData()
 }
 
 // Fungsi untuk mendapatkan node tengah dari linked list
-struct List* getMiddle(struct List* head) {
-  if (head == NULL) return head;
-  
-  struct List* slow = head;
-  struct List* fast = head->next;
-  
-  while (fast != NULL) {
+struct List *getMiddle(struct List *head)
+{
+  if (head == NULL)
+    return head;
+
+  struct List *slow = head;
+  struct List *fast = head->next;
+
+  while (fast != NULL)
+  {
     fast = fast->next;
-    if (fast != NULL) {
+    if (fast != NULL)
+    {
       slow = slow->next;
       fast = fast->next;
     }
@@ -667,236 +692,276 @@ struct List* getMiddle(struct List* head) {
 
 // Fungsi untuk membandingkan tanggal (format DD/MM/YYYY)
 // Return: negatif jika tgl1 < tgl2, 0 jika sama, positif jika tgl1 > tgl2
-int compareTanggal(const char* tgl1, const char* tgl2) {
+int compareTanggal(const char *tgl1, const char *tgl2)
+{
   // Parse tanggal 1
   int day1, month1, year1;
   sscanf(tgl1, "%d/%d/%d", &day1, &month1, &year1);
-  
+
   // Parse tanggal 2
   int day2, month2, year2;
   sscanf(tgl2, "%d/%d/%d", &day2, &month2, &year2);
-  
+
   // Bandingkan tahun dulu
-  if (year1 != year2) return year1 - year2;
+  if (year1 != year2)
+    return year1 - year2;
   // Lalu bulan
-  if (month1 != month2) return month1 - month2;
+  if (month1 != month2)
+    return month1 - month2;
   // Terakhir hari
   return day1 - day2;
 }
 
 // Merge dua linked list yang sudah terurut berdasarkan Nominal
-struct List* mergeSortedByNominal(struct List* left, struct List* right, bool ascending) {
-  if (left == NULL) return right;
-  if (right == NULL) return left;
-  
-  struct List* result = NULL;
-  
+struct List *mergeSortedByNominal(struct List *left, struct List *right, bool ascending)
+{
+  if (left == NULL)
+    return right;
+  if (right == NULL)
+    return left;
+
+  struct List *result = NULL;
+
   // Konversi ke nilai yang sama (IDR) untuk perbandingan
   long long leftValue = (left->currency == 1) ? left->nominal : left->nominal * nilaiKursDollar;
   long long rightValue = (right->currency == 1) ? right->nominal : right->nominal * nilaiKursDollar;
-  
+
   bool condition;
-  if (ascending) {
+  if (ascending)
+  {
     condition = (leftValue <= rightValue);
-  } else {
+  }
+  else
+  {
     condition = (leftValue >= rightValue);
   }
-  
-  if (condition) {
+
+  if (condition)
+  {
     result = left;
     result->next = mergeSortedByNominal(left->next, right, ascending);
-  } else {
+  }
+  else
+  {
     result = right;
     result->next = mergeSortedByNominal(left, right->next, ascending);
   }
-  
+
   return result;
 }
 
 // Merge dua linked list yang sudah terurut berdasarkan Tanggal
-struct List* mergeSortedByTanggal(struct List* left, struct List* right, bool ascending) {
-  if (left == NULL) return right;
-  if (right == NULL) return left;
-  
-  struct List* result = NULL;
-  
+struct List *mergeSortedByTanggal(struct List *left, struct List *right, bool ascending)
+{
+  if (left == NULL)
+    return right;
+  if (right == NULL)
+    return left;
+
+  struct List *result = NULL;
+
   int cmp = compareTanggal(left->tanggal, right->tanggal);
-  
+
   bool condition;
-  if (ascending) {
+  if (ascending)
+  {
     condition = (cmp <= 0);
-  } else {
+  }
+  else
+  {
     condition = (cmp >= 0);
   }
-  
-  if (condition) {
+
+  if (condition)
+  {
     result = left;
     result->next = mergeSortedByTanggal(left->next, right, ascending);
-  } else {
+  }
+  else
+  {
     result = right;
     result->next = mergeSortedByTanggal(left, right->next, ascending);
   }
-  
+
   return result;
 }
 
 // Merge Sort untuk Nominal
-struct List* mergeSortByNominal(struct List* head, bool ascending) {
+struct List *mergeSortByNominal(struct List *head, bool ascending)
+{
   // Base case: jika list kosong atau hanya 1 node
-  if (head == NULL || head->next == NULL) {
+  if (head == NULL || head->next == NULL)
+  {
     return head;
   }
-  
+
   // Cari node tengah
-  struct List* middle = getMiddle(head);
-  struct List* nextOfMiddle = middle->next;
-  
+  struct List *middle = getMiddle(head);
+  struct List *nextOfMiddle = middle->next;
+
   // Putus linked list menjadi dua bagian
   middle->next = NULL;
-  
+
   // Rekursif sort kedua bagian
-  struct List* left = mergeSortByNominal(head, ascending);
-  struct List* right = mergeSortByNominal(nextOfMiddle, ascending);
-  
+  struct List *left = mergeSortByNominal(head, ascending);
+  struct List *right = mergeSortByNominal(nextOfMiddle, ascending);
+
   // Merge kedua bagian yang sudah terurut
   return mergeSortedByNominal(left, right, ascending);
 }
 
 // Merge Sort untuk Tanggal
-struct List* mergeSortByTanggal(struct List* head, bool ascending) {
+struct List *mergeSortByTanggal(struct List *head, bool ascending)
+{
   // Base case: jika list kosong atau hanya 1 node
-  if (head == NULL || head->next == NULL) {
+  if (head == NULL || head->next == NULL)
+  {
     return head;
   }
-  
+
   // Cari node tengah
-  struct List* middle = getMiddle(head);
-  struct List* nextOfMiddle = middle->next;
-  
+  struct List *middle = getMiddle(head);
+  struct List *nextOfMiddle = middle->next;
+
   // Putus linked list menjadi dua bagian
   middle->next = NULL;
-  
+
   // Rekursif sort kedua bagian
-  struct List* left = mergeSortByTanggal(head, ascending);
-  struct List* right = mergeSortByTanggal(nextOfMiddle, ascending);
-  
+  struct List *left = mergeSortByTanggal(head, ascending);
+  struct List *right = mergeSortByTanggal(nextOfMiddle, ascending);
+
   // Merge kedua bagian yang sudah terurut
   return mergeSortedByTanggal(left, right, ascending);
 }
 
 void cariData()
 {
- if (pengeluaran == NULL) {
-        cout << "\n [DATA KOSONG] Tidak ada yang bisa dicari.\n";
-        return;
+  if (pengeluaran == NULL)
+  {
+    cout << "\n [DATA KOSONG] Tidak ada yang bisa dicari.\n";
+    return;
+  }
+
+  cin.ignore(); // bersihkan buffer input
+
+  int pilihan;
+  char keyword[200];
+
+  cout << "\n --- MENU PENCARIAN DATA ---\n";
+  cout << " [1] Cari berdasarkan Tanggal\n";
+  cout << " [2] Cari berdasarkan Deskripsi\n";
+  cout << " [3] Cari berdasarkan Kategori\n";
+  cout << " [4] Cari berdasarkan Nominal tepat\n";
+  cout << " [0] Batal\n";
+  cout << " --------------------------------\n";
+  cout << " Pilihan: ";
+  cin >> pilihan;
+
+  if (pilihan == 0)
+  {
+    cout << " Pencarian dibatalkan.\n";
+    return;
+  }
+
+  cin.ignore();
+
+  long long cariNominal = 0;
+
+  if (pilihan >= 1 && pilihan <= 3)
+  {
+    cout << " Masukkan kata kunci: ";
+    cin.getline(keyword, 200);
+
+    // ubah ke lowercase untuk pencarian
+    toLowerCase(keyword);
+  }
+  else if (pilihan == 4)
+  {
+    cout << " Masukkan nominal (angka): ";
+    cin >> cariNominal;
+  }
+  else
+  {
+    cout << " [Error] Pilihan tidak valid.\n";
+    return;
+  }
+
+  cout << "\n --- HASIL PENCARIAN ---\n";
+
+  cout << " ----------------------------------------------------------------------------------------- \n";
+  cout << "| No | " << left << setw(12) << "TANGGAL"
+       << "| " << left << setw(25) << "DESKRIPSI"
+       << "| " << left << setw(10) << "KATEGORI"
+       << "| " << right << setw(18) << "NOMINAL" << " |\n";
+  cout << " ----------------------------------------------------------------------------------------- \n";
+
+  struct List *temp = pengeluaran;
+  int no = 1;
+  bool ditemukan = false;
+
+  while (temp != NULL)
+  {
+    bool match = false;
+
+    // buffer lowercase
+    char lowTanggal[200], lowDeskripsi[200], lowKategori[200];
+
+    strcpy(lowTanggal, temp->tanggal);
+    strcpy(lowDeskripsi, temp->deskripsi);
+    strcpy(lowKategori, temp->kategori);
+
+    toLowerCase(lowTanggal);
+    toLowerCase(lowDeskripsi);
+    toLowerCase(lowKategori);
+
+    // cek sesuai pilihan pencarian
+    if (pilihan == 1 && strstr(lowTanggal, keyword))
+      match = true;
+    if (pilihan == 2 && strstr(lowDeskripsi, keyword))
+      match = true;
+    if (pilihan == 3 && strstr(lowKategori, keyword))
+      match = true;
+    if (pilihan == 4 && temp->nominal == cariNominal)
+      match = true;
+
+    if (match)
+    {
+      ditemukan = true;
+
+      cout << "| " << setw(2) << no << " | "
+           << left << setw(12) << temp->tanggal
+           << "| " << left << setw(25) << temp->deskripsi
+           << "| " << left << setw(10) << temp->kategori
+           << "| ";
+
+      if (temp->currency == 1)
+      {
+        cout << right << setw(15);
+        printRupiah(temp->nominal);
+        cout << "   |";
+      }
+      else
+      {
+        cout << right << setw(12) << "$ " << temp->nominal << "     |";
+      }
+
+      cout << "\n";
     }
 
-    cin.ignore(); // bersihkan buffer input
+    temp = temp->next;
+    no++;
+  }
 
-    int pilihan;
-    char keyword[200];
+  cout << " ----------------------------------------------------------------------------------------- \n";
 
-    cout << "\n --- MENU PENCARIAN DATA ---\n";
-    cout << " [1] Cari berdasarkan Tanggal\n";
-    cout << " [2] Cari berdasarkan Deskripsi\n";
-    cout << " [3] Cari berdasarkan Kategori\n";
-    cout << " [4] Cari berdasarkan Nominal tepat\n";
-    cout << " [0] Batal\n";
-    cout << " --------------------------------\n";
-    cout << " Pilihan: ";
-    cin >> pilihan;
+  if (!ditemukan)
+  {
+    cout << "\n   [Tidak ada data yang cocok dengan pencarian]\n\n";
+  }
 
-    if (pilihan == 0) {
-        cout << " Pencarian dibatalkan.\n";
-        return;
-    }
-
-    cin.ignore();
-
-    long long cariNominal = 0;
-
-    if (pilihan >= 1 && pilihan <= 3) {
-        cout << " Masukkan kata kunci: ";
-        cin.getline(keyword, 200);
-
-        // ubah ke lowercase untuk pencarian
-        toLowerCase(keyword);
-    }
-    else if (pilihan == 4) {
-        cout << " Masukkan nominal (angka): ";
-        cin >> cariNominal;
-    }
-    else {
-        cout << " [Error] Pilihan tidak valid.\n";
-        return;
-    }
-
-    cout << "\n --- HASIL PENCARIAN ---\n";
-
-    cout << " ----------------------------------------------------------------------------------------- \n";
-    cout << "| No | " << left << setw(12) << "TANGGAL"
-         << "| " << left << setw(25) << "DESKRIPSI"
-         << "| " << left << setw(10) << "KATEGORI"
-         << "| " << right << setw(18) << "NOMINAL" << " |\n";
-    cout << " ----------------------------------------------------------------------------------------- \n";
-
-    struct List *temp = pengeluaran;
-    int no = 1;
-    bool ditemukan = false;
-
-    while (temp != NULL) {
-        bool match = false;
-
-        // buffer lowercase
-        char lowTanggal[200], lowDeskripsi[200], lowKategori[200];
-
-        strcpy(lowTanggal, temp->tanggal);
-        strcpy(lowDeskripsi, temp->deskripsi);
-        strcpy(lowKategori, temp->kategori);
-
-        toLowerCase(lowTanggal);
-        toLowerCase(lowDeskripsi);
-        toLowerCase(lowKategori);
-
-        // cek sesuai pilihan pencarian
-        if (pilihan == 1 && strstr(lowTanggal, keyword)) match = true;
-        if (pilihan == 2 && strstr(lowDeskripsi, keyword)) match = true;
-        if (pilihan == 3 && strstr(lowKategori, keyword)) match = true;
-        if (pilihan == 4 && temp->nominal == cariNominal) match = true;
-
-        if (match) {
-            ditemukan = true;
-
-            cout << "| " << setw(2) << no << " | "
-                 << left << setw(12) << temp->tanggal
-                 << "| " << left << setw(25) << temp->deskripsi
-                 << "| " << left << setw(10) << temp->kategori
-                 << "| ";
-
-            if (temp->currency == 1) {
-                cout << right << setw(15);
-                printRupiah(temp->nominal);
-                cout << "   |";
-            } else {
-                cout << right << setw(12) << "$ " << temp->nominal << "     |";
-            }
-
-            cout << "\n";
-        }
-
-        temp = temp->next;
-        no++;
-    }
-
-    cout << " ----------------------------------------------------------------------------------------- \n";
-
-    if (!ditemukan) {
-        cout << "\n   [Tidak ada data yang cocok dengan pencarian]\n\n";
-    }
-
-    cout << " Tekan Enter...";
-    cin.ignore();
-    cin.get();
+  cout << " Tekan Enter...";
+  cin.ignore();
+  cin.get();
 }
 
 void bersihkanMemori()
@@ -907,127 +972,151 @@ void bersihkanMemori()
 void tambahPengeluaran()
 {
   showHeader();
-    cin.ignore(); // bersihkan buffer agar getline tidak ter-skip
+  cin.ignore(); // bersihkan buffer agar getline tidak ter-skip
 
-    char tgl[50], desc[200], kat[100];
-    long long nominal;
-    int currency;
+  char tgl[50], desc[200], kat[100];
+  long long nominal;
+  int currency;
 
-    cout << "\n --- TAMBAH PENGELUARAN ---\n";
+  cout << "\n --- TAMBAH PENGELUARAN ---\n";
 
-    cout << " Tanggal (DD/MM/YYYY): ";
-    cin.getline(tgl, 50);
+  cout << " Tanggal (DD/MM/YYYY): ";
+  cin.getline(tgl, 50);
 
-    cout << " Deskripsi             : ";
-    cin.getline(desc, 200);
+  cout << " Deskripsi             : ";
+  cin.getline(desc, 200);
 
-    cout << " Kategori              : ";
-    cin.getline(kat, 100);
+  cout << " Kategori              : ";
+  cin.getline(kat, 100);
 
-    toProperCase(kat);
+  toProperCase(kat);
 
-    cout << " Nominal               : ";
-    cin >> nominal;
+  cout << " Nominal               : ";
+  cin >> nominal;
 
-    do {
-        cout << " Mata Uang [1] IDR  [2] USD : ";
-        cin >> currency;
+  do
+  {
+    cout << " Mata Uang [1] IDR  [2] USD : ";
+    cin >> currency;
 
-        if (currency != 1 && currency != 2) {
-            cout << " [Error] Pilihan mata uang tidak valid. Silakan coba lagi.\n";
-        }
-    } while (currency != 1 && currency != 2);
-    // Panggil fungsi penambah node
-    tambahData(tgl, desc, kat, nominal, currency);
-
-    cout << "\n [Sukses] Pengeluaran berhasil ditambahkan!\n";
-
-}
-
-void toLowerCase(char* str) {
-    for (int i = 0; str[i]; i++) {
-        if (str[i] >= 'A' && str[i] <= 'Z') {
-            str[i] += 32; // jadi huruf kecil
-        }
+    if (currency != 1 && currency != 2)
+    {
+      cout << " [Error] Pilihan mata uang tidak valid. Silakan coba lagi.\n";
     }
+  } while (currency != 1 && currency != 2);
+  // Panggil fungsi penambah node
+  tambahData(tgl, desc, kat, nominal, currency);
+
+  cout << "\n [Sukses] Pengeluaran berhasil ditambahkan!\n";
 }
 
-void toProperCase(char* str) {
-    bool startWord = true;
-    for (int i = 0; str[i]; i++) {
-        char c = str[i];
-
-        if (c == ' ' || c == '\t') {
-            startWord = true;
-        } else {
-            if (startWord) {
-                // huruf pertama kata → BESAR
-                if (c >= 'a' && c <= 'z') {
-                    str[i] = c - 32;
-                }
-                startWord = false;
-            } else {
-                // huruf setelahnya → kecil
-                if (c >= 'A' && c <= 'Z') {
-                    str[i] = c + 32;
-                }
-            }
-        }
+void toLowerCase(char *str)
+{
+  for (int i = 0; str[i]; i++)
+  {
+    if (str[i] >= 'A' && str[i] <= 'Z')
+    {
+      str[i] += 32; // jadi huruf kecil
     }
+  }
 }
 
+void toProperCase(char *str)
+{
+  bool startWord = true;
+  for (int i = 0; str[i]; i++)
+  {
+    char c = str[i];
+
+    if (c == ' ' || c == '\t')
+    {
+      startWord = true;
+    }
+    else
+    {
+      if (startWord)
+      {
+        // huruf pertama kata → BESAR
+        if (c >= 'a' && c <= 'z')
+        {
+          str[i] = c - 32;
+        }
+        startWord = false;
+      }
+      else
+      {
+        // huruf setelahnya → kecil
+        if (c >= 'A' && c <= 'Z')
+        {
+          str[i] = c + 32;
+        }
+      }
+    }
+  }
+}
 
 void groupingPengeluaranKategori()
 {
-    showHeader();
-    if (pengeluaran == NULL) {
-        cout << "\n\t[ DATA KOSONG ]\n\n";
+  showHeader();
+  if (pengeluaran == NULL)
+  {
+    cout << "\n\t[ DATA KOSONG ]\n\n";
     return;
-    }
+  }
 
-    char kategoriList[50][100];
-    long long totalKategori[50] = {0};
-    int jumlahKategori = 0;
-    struct List* temp = pengeluaran;
+  char kategoriList[50][100];
+  long long totalKategori[50] = {0};
+  int jumlahKategori = 0;
+  struct List *temp = pengeluaran;
 
-    while(temp != NULL){
-        long long NominalInIDR = (temp->currency == 1) ? temp->nominal : temp->nominal * nilaiKursDollar;
-        bool found = false;
-        for(int i = 0; i < jumlahKategori; i++){
-            if(strcmp(kategoriList[i], temp->kategori) == 0){
-                totalKategori[i] += NominalInIDR;
-                found = true;
-                break;
-            }
-        }
-        if(!found){
-            strcpy(kategoriList[jumlahKategori], temp->kategori);
-            totalKategori[jumlahKategori] = NominalInIDR;
-            jumlahKategori++;
-        }
-        temp = temp->next;
+  while (temp != NULL)
+  {
+    long long NominalInIDR = (temp->currency == 1) ? temp->nominal : temp->nominal * nilaiKursDollar;
+    bool found = false;
+    for (int i = 0; i < jumlahKategori; i++)
+    {
+      if (strcmp(kategoriList[i], temp->kategori) == 0)
+      {
+        totalKategori[i] += NominalInIDR;
+        found = true;
+        break;
+      }
     }
-    cout << "\n--- TOTAL PENGELUARAN PER KATEGORI ---\n";
-    cout << "Semua nominal ditampilkan dalam Rupiah (IDR)\n\n";
+    if (!found)
+    {
+      strcpy(kategoriList[jumlahKategori], temp->kategori);
+      totalKategori[jumlahKategori] = NominalInIDR;
+      jumlahKategori++;
+    }
+    temp = temp->next;
+  }
+  cout << "\n--- TOTAL PENGELUARAN PER KATEGORI ---\n";
+  cout << "Semua nominal ditampilkan dalam Rupiah (IDR)\n\n";
 
-    for (int i = 0; i < jumlahKategori; i++){
-        cout << left << setw(20) << kategoriList[i] << ": Rp ";
-        printRupiah(totalKategori[i]);
-        cout << "\n";
-    }
-    cout << "\nKurs yang digunakan: $1 = Rp " << nilaiKursDollar << endl;
-    cout << "---------------------------------\n";
+  for (int i = 0; i < jumlahKategori; i++)
+  {
+    cout << left << setw(20) << kategoriList[i] << ": Rp ";
+    printRupiah(totalKategori[i]);
+    cout << "\n";
+  }
+  cout << "\nKurs yang digunakan: $1 = Rp " << nilaiKursDollar << endl;
+  cout << "---------------------------------\n";
 }
 
-void printPotong(const char* teks, int maxLebar) {
-    int panjang = strlen(teks);
-    
-    if (panjang <= maxLebar) {
-        cout << left << setw(maxLebar) << teks;
-    } else {
-        for (int i = 0; i < maxLebar - 3; i++) {
-            cout << teks[i];
-        }
-        cout << "...";
+void printPotong(const char *teks, int maxLebar)
+{
+  int panjang = strlen(teks);
+
+  if (panjang <= maxLebar)
+  {
+    cout << left << setw(maxLebar) << teks;
+  }
+  else
+  {
+    for (int i = 0; i < maxLebar - 3; i++)
+    {
+      cout << teks[i];
     }
+    cout << "...";
+  }
 }
