@@ -535,8 +535,10 @@ void tambahPengeluaran()
   cin>>kategori;
   cout<<"Barang: ";
   cin>>barang;
-  
-  cout<<"Masuk: "<<nominal;
-  cout<<"Keluar: "<<tanggal;
+
+  cout<<"Tanggal: ";
+  cin>>tanggal;
+  cout<<"Nominal: ";
+  cin>>nominal;
 
 }
