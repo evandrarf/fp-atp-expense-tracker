@@ -39,6 +39,14 @@ void groupingPengeluaranKategori();
 void toLowerCase(char* str);
 void toProperCase(char* str);
 
+// Fungsi untuk Merge Sort Linked List
+struct List* getMiddle(struct List* head);
+struct List* mergeSortedByNominal(struct List* left, struct List* right, bool ascending);
+struct List* mergeSortedByTanggal(struct List* left, struct List* right, bool ascending);
+struct List* mergeSortByNominal(struct List* head, bool ascending);
+struct List* mergeSortByTanggal(struct List* head, bool ascending);
+int compareTanggal(const char* tgl1, const char* tgl2);
+
 int main()
 {
   loadFile();
@@ -593,7 +601,188 @@ void hapusData() {
 
 void sortingData()
 {
-  // TODO: Implement sorting functionality
+  if (pengeluaran == NULL) {
+    cout << "\n\t[ DATA KOSONG ]\n\n";
+    return;
+  }
+
+  showHeader();
+  int pilihan;
+  cout << "\n --- SORTING PENGELUARAN ---\n";
+  cout << " [1] Sort berdasarkan Nominal\n";
+  cout << " [2] Sort berdasarkan Tanggal\n";
+  cout << " [0] Batal\n";
+  cout << " ---------------------------\n";
+  cout << " Pilihanmu: ";
+  cin >> pilihan;
+
+  if (pilihan == 0) {
+    cout << " Sorting dibatalkan.\n";
+    return;
+  }
+
+  if (pilihan != 1 && pilihan != 2) {
+    cout << " [Error] Pilihan tidak valid.\n";
+    return;
+  }
+
+  int urutan;
+  cout << "\n --- PILIH URUTAN ---\n";
+  cout << " [1] Ascending (Kecil ke Besar)\n";
+  cout << " [2] Descending (Besar ke Kecil)\n";
+  cout << " Pilihanmu: ";
+  cin >> urutan;
+
+  bool ascending = (urutan == 1);
+
+  if (pilihan == 1) {
+    // Sort by Nominal
+    pengeluaran = mergeSortByNominal(pengeluaran, ascending);
+    cout << "\n [Sukses] Data berhasil diurutkan berdasarkan Nominal!\n";
+  } else if (pilihan == 2) {
+    // Sort by Tanggal
+    pengeluaran = mergeSortByTanggal(pengeluaran, ascending);
+    cout << "\n [Sukses] Data berhasil diurutkan berdasarkan Tanggal!\n";
+  }
+
+  // Tampilkan hasil sorting
+  tampilkanData();
+}
+
+// Fungsi untuk mendapatkan node tengah dari linked list
+struct List* getMiddle(struct List* head) {
+  if (head == NULL) return head;
+  
+  struct List* slow = head;
+  struct List* fast = head->next;
+  
+  while (fast != NULL) {
+    fast = fast->next;
+    if (fast != NULL) {
+      slow = slow->next;
+      fast = fast->next;
+    }
+  }
+  return slow;
+}
+
+// Fungsi untuk membandingkan tanggal (format DD/MM/YYYY)
+// Return: negatif jika tgl1 < tgl2, 0 jika sama, positif jika tgl1 > tgl2
+int compareTanggal(const char* tgl1, const char* tgl2) {
+  // Parse tanggal 1
+  int day1, month1, year1;
+  sscanf(tgl1, "%d/%d/%d", &day1, &month1, &year1);
+  
+  // Parse tanggal 2
+  int day2, month2, year2;
+  sscanf(tgl2, "%d/%d/%d", &day2, &month2, &year2);
+  
+  // Bandingkan tahun dulu
+  if (year1 != year2) return year1 - year2;
+  // Lalu bulan
+  if (month1 != month2) return month1 - month2;
+  // Terakhir hari
+  return day1 - day2;
+}
+
+// Merge dua linked list yang sudah terurut berdasarkan Nominal
+struct List* mergeSortedByNominal(struct List* left, struct List* right, bool ascending) {
+  if (left == NULL) return right;
+  if (right == NULL) return left;
+  
+  struct List* result = NULL;
+  
+  // Konversi ke nilai yang sama (IDR) untuk perbandingan
+  long long leftValue = (left->currency == 1) ? left->nominal : left->nominal * nilaiKursDollar;
+  long long rightValue = (right->currency == 1) ? right->nominal : right->nominal * nilaiKursDollar;
+  
+  bool condition;
+  if (ascending) {
+    condition = (leftValue <= rightValue);
+  } else {
+    condition = (leftValue >= rightValue);
+  }
+  
+  if (condition) {
+    result = left;
+    result->next = mergeSortedByNominal(left->next, right, ascending);
+  } else {
+    result = right;
+    result->next = mergeSortedByNominal(left, right->next, ascending);
+  }
+  
+  return result;
+}
+
+// Merge dua linked list yang sudah terurut berdasarkan Tanggal
+struct List* mergeSortedByTanggal(struct List* left, struct List* right, bool ascending) {
+  if (left == NULL) return right;
+  if (right == NULL) return left;
+  
+  struct List* result = NULL;
+  
+  int cmp = compareTanggal(left->tanggal, right->tanggal);
+  
+  bool condition;
+  if (ascending) {
+    condition = (cmp <= 0);
+  } else {
+    condition = (cmp >= 0);
+  }
+  
+  if (condition) {
+    result = left;
+    result->next = mergeSortedByTanggal(left->next, right, ascending);
+  } else {
+    result = right;
+    result->next = mergeSortedByTanggal(left, right->next, ascending);
+  }
+  
+  return result;
+}
+
+// Merge Sort untuk Nominal
+struct List* mergeSortByNominal(struct List* head, bool ascending) {
+  // Base case: jika list kosong atau hanya 1 node
+  if (head == NULL || head->next == NULL) {
+    return head;
+  }
+  
+  // Cari node tengah
+  struct List* middle = getMiddle(head);
+  struct List* nextOfMiddle = middle->next;
+  
+  // Putus linked list menjadi dua bagian
+  middle->next = NULL;
+  
+  // Rekursif sort kedua bagian
+  struct List* left = mergeSortByNominal(head, ascending);
+  struct List* right = mergeSortByNominal(nextOfMiddle, ascending);
+  
+  // Merge kedua bagian yang sudah terurut
+  return mergeSortedByNominal(left, right, ascending);
+}
+
+// Merge Sort untuk Tanggal
+struct List* mergeSortByTanggal(struct List* head, bool ascending) {
+  // Base case: jika list kosong atau hanya 1 node
+  if (head == NULL || head->next == NULL) {
+    return head;
+  }
+  
+  // Cari node tengah
+  struct List* middle = getMiddle(head);
+  struct List* nextOfMiddle = middle->next;
+  
+  // Putus linked list menjadi dua bagian
+  middle->next = NULL;
+  
+  // Rekursif sort kedua bagian
+  struct List* left = mergeSortByTanggal(head, ascending);
+  struct List* right = mergeSortByTanggal(nextOfMiddle, ascending);
+  
+  // Merge kedua bagian yang sudah terurut
+  return mergeSortedByTanggal(left, right, ascending);
 }
 
 void cariData()
