@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <cstdio>
 using namespace std;
 
 struct List
@@ -124,25 +125,17 @@ int main()
       break;
     case 11:
       bersihkanMemori();
-      cout << " Memori dibersihkan. Semua data dihapus dari memori.\n";
       break;
     case 12:
       cout << "Keluar program\n";
       cout << "Terima kasih telah menggunakan aplikasi ini!\n";
       return 0;
-      break;
 
     default:
       cout << " Pilihan tidak valid.\n";
     }
 
     // if (pilihan != 4 && pilihan != 6 && pilihan != 7 && pilihan != 5 && pilihan != 9 && pilihan != 10)
-    if (pilihan == 1)
-    {
-      cout << " Tekan Enter...";
-      cin.ignore();
-      cin.get();
-    }
 
   } while (pilihan != 12);
 
@@ -384,7 +377,7 @@ void tampilkanData()
     cin.get();
     return;
   }
-
+  cout << setfill(' ');
   cout << " ----------------------------------------------------------------------------------------- \n";
   cout << "| No | " << left << setw(12) << "TANGGAL"
        << "| " << left << setw(25) << "DESKRIPSI"
@@ -509,7 +502,7 @@ void editData()
     getTanggalHariIni(hariIni, bulanIni, tahunIni);
     cout << " (Hari ini: " << setfill('0') << setw(2) << hariIni << "/"
          << setw(2) << bulanIni << "/" << tahunIni << ")\n";
-
+    cout << setfill(' ');
     while (true)
     {
       cout << " Masukkan tanggal baru (DD/MM/YYYY): ";
@@ -611,7 +604,7 @@ void editData()
     getTanggalHariIni(hariIni, bulanIni, tahunIni);
     cout << " (Hari ini: " << setfill('0') << setw(2) << hariIni << "/"
          << setw(2) << bulanIni << "/" << tahunIni << ")\n";
-
+    cout << setfill(' ');
     while (true)
     {
       cout << " Masukkan tanggal baru (DD/MM/YYYY): ";
@@ -988,8 +981,8 @@ void cariData()
   char keyword[200];
 
   cout << "\n --- MENU PENCARIAN DATA ---\n";
-  cout << " [2] Cari berdasarkan Deskripsi\n";
-  cout << " [3] Cari berdasarkan Kategori\n";
+  cout << " [1] Cari berdasarkan Deskripsi\n";
+  cout << " [2] Cari berdasarkan Kategori\n";
   cout << " [0] Batal\n";
   cout << " --------------------------------\n";
   cout << " Pilihan: ";
@@ -1005,7 +998,7 @@ void cariData()
 
   long long cariNominal = 0;
 
-  if (pilihan >= 1 && pilihan <= 2)
+  if (pilihan == 1 || pilihan == 2)
   {
     cout << " Masukkan kata kunci: ";
     cin.getline(keyword, 200);
@@ -1047,15 +1040,11 @@ void cariData()
     toLowerCase(lowKategori);
 
     // cek sesuai pilihan pencarian
-    if (pilihan == 1 && strstr(lowTanggal, keyword))
+    if (pilihan == 1 && strstr(lowDeskripsi, keyword))
       match = true;
-    if (pilihan == 2 && strstr(lowDeskripsi, keyword))
+    if (pilihan == 2 && strstr(lowKategori, keyword))
       match = true;
-    if (pilihan == 3 && strstr(lowKategori, keyword))
-      match = true;
-    if (pilihan == 4 && temp->nominal == cariNominal)
-      match = true;
-
+    
     if (match)
     {
       ditemukan = true;
@@ -1092,7 +1081,6 @@ void cariData()
   }
 
   cout << " Tekan Enter...";
-  cin.ignore();
   cin.get();
 }
 
@@ -1437,6 +1425,8 @@ void tambahPengeluaran()
   tambahData(tgl, desc, kat, nominal, currency);
 
   cout << "\n [Sukses] Pengeluaran berhasil ditambahkan!\n";
+    cout << " Tekan Enter...";
+    cin.get();
 }
 
 void toLowerCase(char *str)
@@ -1533,6 +1523,9 @@ void groupingPengeluaranKategori()
   }
   cout << "\nKurs yang digunakan: $1 = Rp " << nilaiKursDollar << endl;
   cout << "---------------------------------\n";
+   cout << " Tekan Enter...";
+      cin.ignore();
+      cin.get();
 }
 
 void printPotong(const char *teks, int maxLebar)
@@ -1732,6 +1725,8 @@ void persentaseExpensePerBulan()
     }
     cout << endl;
   }
-
   cout << "============================================" << endl;
+   cout << " Tekan Enter...";
+      cin.ignore();
+      cin.get();
 }
