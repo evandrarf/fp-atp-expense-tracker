@@ -2,6 +2,7 @@
 #include <string.h>
 #include <iomanip>
 #include <fstream>
+#include <cstdlib>
 using namespace std;
 
 struct List{
@@ -258,7 +259,34 @@ void simpanFile()
 
 void tambahData(const char *tgl, const char *desc, const char *kat, long long nominal, int currency)
 {
-  // TODO: Implement adding data functionality
+  struct List *nodeBaru = new List;
+
+  nodeBaru->tanggal = new char[strlen(tgl) + 1];
+  strcpy(nodeBaru->tanggal, tgl);
+
+  nodeBaru->deskripsi = new char[strlen(desc) + 1];
+  strcpy(nodeBaru->deskripsi, desc);
+
+  nodeBaru->kategori = new char[strlen(kat) + 1];
+  strcpy(nodeBaru->kategori, kat);
+
+  nodeBaru->nominal = nominal;
+  nodeBaru->currency = currency;
+  nodeBaru->next = NULL;
+
+  if (pengeluaran == NULL)
+  {
+    pengeluaran = nodeBaru;
+  }
+  else
+  {
+    struct List *temp = pengeluaran;
+    while (temp->next != NULL)
+    {
+      temp = temp->next;
+    }
+    temp->next = nodeBaru;
+  }
 }
 
 void printRupiah(long long amount)
@@ -598,6 +626,8 @@ void tambahPengeluaran()
     cout << " Kategori              : ";
     cin.getline(kat, 100);
 
+    toProperCase(kat);
+
     cout << " Nominal               : ";
     cin >> nominal;
 
@@ -658,8 +688,8 @@ void groupingPengeluaranKategori()
     return;
     }
 
-    char kategoriList[50][30];
-    long long totalKategori[50];
+    char kategoriList[50][100];
+    long long totalKategori[50] = {0};
     int jumlahKategori = 0;
     struct List* temp = pengeluaran;
 
