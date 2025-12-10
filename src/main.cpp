@@ -531,5 +531,12 @@ void tambahPengeluaran()
   int tanggal, nominal;
   char barang[10], kategori[10]; 
 
-  cout<<" "
+  cout<<"Kategori:  ";
+  cin>>kategori;
+  cout<<"Barang: ";
+  cin>>barang;
+  
+  cout<<"Masuk: "<<nominal;
+  cout<<"Keluar: "<<tanggal;
+
 }
