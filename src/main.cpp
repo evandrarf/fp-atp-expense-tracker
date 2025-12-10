@@ -497,4 +497,6 @@ void tambahPengeluaran()
   // TODO: Implement add expense functionality
   int tanggal, nominal;
   char barang[10], kategori[10]; 
+
+  cout<<" "
 }
