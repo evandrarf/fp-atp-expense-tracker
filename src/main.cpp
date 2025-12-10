@@ -22,6 +22,7 @@ long long nilaiKursDollar = 16000; // nilai tukar awal
 void showHeader();
 void printRupiah(long long amount);
 void aturKurs();
+void printPotong(const char* teks, int maxLebar);
 
 // BUAT FILE MANAGEMENT
 void loadFile();
@@ -303,7 +304,8 @@ void printRupiah(long long amount)
   else
   {
     printRupiah(amount / 1000);
-    cout << "." << setfill('0') << setw(3) << (amount % 1000);
+    cout << "." << setfill('0') << setw(3) << (amount % 1000);  
+    cout << setfill(' ');
   }
 }
 
@@ -335,8 +337,8 @@ void tampilkanData()
   cout << " ----------------------------------------------------------------------------------------- \n";
   cout << "| No | " << left << setw(12) << "TANGGAL"
        << "| " << left << setw(25) << "DESKRIPSI"
-       << "| " << left << setw(10) << "KATEGORI"
-       << "| " << right << setw(18) << "NOMINAL" << " |\n";
+       << "| " << left << setw(20) << "KATEGORI"
+       << "| " << right << setw(20) << "NOMINAL" << " |\n";
   cout << " ----------------------------------------------------------------------------------------- \n";
 
   struct List *temp = pengeluaran;
@@ -347,27 +349,24 @@ void tampilkanData()
   {
     cout << "| " << setw(2) << no << " | "
          << left << setw(12) << temp->tanggal
-         << "| " << left << setw(25) << temp->deskripsi
-         << "| " << left << setw(10) << temp->kategori
          << "| ";
+    printPotong(temp->deskripsi, 25);
+    cout << "| ";
+    printPotong(temp->kategori, 20);
+    cout << "| ";
 
-    // --- LOGIKA MATA UANG ---
     if (temp->currency == 1)
     {
-      // Jika Rupiah: Tampil Rata Kanan, Panggil Format Rp
       cout << right << setw(15);
       printRupiah(temp->nominal);
-      cout << "   |"; // Spasi penutup
+      cout << "   |";
 
-      // Tambah ke total langsung
       totalEstimasiRupiah += temp->nominal;
     }
     else if (temp->currency == 2)
     {
-      // Jika Dollar: Tampil "$ 100"
       cout << right << setw(12) << "$ " << temp->nominal << "     |";
 
-      // Tambah ke total (KONVERSI DULU)
       totalEstimasiRupiah += (temp->nominal * nilaiKursDollar);
     }
 
@@ -730,7 +729,7 @@ void tambahPengeluaran()
     cout << " Tanggal (DD/MM/YYYY): ";
     cin.getline(tgl, 50);
 
-    cout << " Deskripsi barang/jasa : ";
+    cout << " Deskripsi             : ";
     cin.getline(desc, 200);
 
     cout << " Kategori              : ";
@@ -741,15 +740,14 @@ void tambahPengeluaran()
     cout << " Nominal               : ";
     cin >> nominal;
 
-    cout << " Mata Uang [1] IDR  [2] USD : ";
-    cin >> currency;
+    do {
+        cout << " Mata Uang [1] IDR  [2] USD : ";
+        cin >> currency;
 
-    if (currency != 1 && currency != 2)
-    {
-        cout << " [Error] Input mata uang tidak valid, default = IDR.\n";
-        currency = 1;
-    }
-
+        if (currency != 1 && currency != 2) {
+            cout << " [Error] Pilihan mata uang tidak valid. Silakan coba lagi.\n";
+        }
+    } while (currency != 1 && currency != 2);
     // Panggil fungsi penambah node
     tambahData(tgl, desc, kat, nominal, currency);
 
@@ -830,4 +828,17 @@ void groupingPengeluaranKategori()
     }
     cout << "\nKurs yang digunakan: $1 = Rp " << nilaiKursDollar << endl;
     cout << "---------------------------------\n";
+}
+
+void printPotong(const char* teks, int maxLebar) {
+    int panjang = strlen(teks);
+    
+    if (panjang <= maxLebar) {
+        cout << left << setw(maxLebar) << teks;
+    } else {
+        for (int i = 0; i < maxLebar - 3; i++) {
+            cout << teks[i];
+        }
+        cout << "...";
+    }
 }
