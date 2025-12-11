@@ -390,7 +390,7 @@ void tampilkanData()
   cout << "| No | " << left << setw(12) << "TANGGAL"
        << "| " << left << setw(25) << "DESKRIPSI"
        << "| " << left << setw(20) << "KATEGORI"
-       << "| " << right << setw(20) << "NOMINAL" << " |\n"; 
+       << "| " << right << setw(19) << "NOMINAL" << " |\n"; 
   cout << " ----------------------------------------------------------------------------------------- \n";
 
   struct List *temp = pengeluaran;
