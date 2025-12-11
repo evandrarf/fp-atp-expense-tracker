@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string.h>
+#include <string>
 #include <iomanip>
 #include <fstream>
 #include <cstdlib>
@@ -23,7 +24,7 @@ long long nilaiKursDollar = 16000; // nilai tukar awal
 // ini deklarasi fungsinya, nanti kalian ubah sendiri sesuai kebutuhan
 // BUAT TAMPILAN
 void showHeader();
-void printRupiah(long long amount);
+string printRupiah(long long amount);
 void aturKurs();
 void printPotong(const char *teks, int maxLebar);
 
@@ -192,6 +193,8 @@ void loadFile()
     }
     fileCsv.close();
     cout << " [System] Data berhasil dimuat dari 'database_keuangan.csv'.\n";
+    cout << " Tekan Enter...";
+    cin.get();
     return;
   }
 
@@ -218,6 +221,8 @@ void loadFile()
     }
     fileTxt.close();
     cout << " [System] Data berhasil dimuat dari 'database_keuangan.txt'.\n";
+    cout << " Tekan Enter...";
+    cin.get();
   }
 }
 
@@ -259,6 +264,8 @@ void simpanFile()
       }
       fileTxt.close();
       cout << "Data tersimpan di 'database_keuangan.txt'\n";
+      cout << " Tekan Enter...";
+      cin.get();
     }
     else
     {
@@ -334,23 +341,22 @@ void tambahData(const char *tgl, const char *desc, const char *kat, long long no
   }
 }
 
-void printRupiah(long long amount)
+string printRupiah(long long number)
 {
-  if (amount < 0)
-  {
-    cout << "-";
-    amount = -amount;
-  }
-  if (amount < 1000)
-  {
-    cout << amount;
-  }
-  else
-  {
-    printRupiah(amount / 1000);
-    cout << "." << setfill('0') << setw(3) << (amount % 1000);
-    cout << setfill(' ');
-  }
+if (number < 0) return "-" + printRupiah(-number);
+    
+    string numStr = to_string(number);
+    string result = "";
+    int count = 0;
+    
+    for (int i = numStr.length() - 1; i >= 0; i--) {
+        result = numStr[i] + result;
+        count++;
+        if (count % 3 == 0 && i > 0) {
+            result = "." + result;
+        }
+    }
+    return result;
 }
 
 void aturKurs()
@@ -377,17 +383,19 @@ void tampilkanData()
     cin.get();
     return;
   }
-  cout << setfill(' ');
+  
+  cout << setfill(' '); 
+  
   cout << " ----------------------------------------------------------------------------------------- \n";
   cout << "| No | " << left << setw(12) << "TANGGAL"
        << "| " << left << setw(25) << "DESKRIPSI"
        << "| " << left << setw(20) << "KATEGORI"
-       << "| " << right << setw(20) << "NOMINAL" << " |\n";
+       << "| " << right << setw(20) << "NOMINAL" << " |\n"; 
   cout << " ----------------------------------------------------------------------------------------- \n";
 
   struct List *temp = pengeluaran;
   int no = 1;
-  long long totalEstimasiRupiah = 0; // Total gabungan (USD dikonversi ke IDR)
+  long long totalEstimasiRupiah = 0;
 
   while (temp != NULL)
   {
@@ -399,19 +407,33 @@ void tampilkanData()
     printPotong(temp->kategori, 20);
     cout << "| ";
 
-    if (temp->currency == 1)
-    {
-      cout << right << setw(15);
-      printRupiah(temp->nominal);
-      cout << "   |";
+    string nominalStr = printRupiah(temp->nominal);
+    
+    int maxLebarNominal = 18; 
 
-      totalEstimasiRupiah += temp->nominal;
+    if (temp->currency == 1) // IDR
+    {
+      string idrStr = "Rp " + nominalStr;
+      
+       if (idrStr.length() > maxLebarNominal) {
+           cout << right << setw(maxLebarNominal) << (idrStr.substr(0, maxLebarNominal-3) + "...");
+       } else {
+           cout << right << setw(maxLebarNominal) << idrStr;
+       }
+       cout << "  |";
+       totalEstimasiRupiah += temp->nominal;
     }
-    else if (temp->currency == 2)
+    else if (temp->currency == 2) // USD
     {
-      cout << right << setw(12) << "$ " << temp->nominal << "     |";
-
-      totalEstimasiRupiah += (temp->nominal * nilaiKursDollar);
+       string usdStr = "$ " + nominalStr;
+       
+       if (usdStr.length() > maxLebarNominal) {
+           cout << right << setw(maxLebarNominal) << (usdStr.substr(0, maxLebarNominal-3) + "...");
+       } else {
+           cout << right << setw(maxLebarNominal) << usdStr;
+       }
+       cout << "  |"; // Spasi penutup
+       totalEstimasiRupiah += (temp->nominal * nilaiKursDollar);
     }
 
     cout << "\n";
@@ -420,11 +442,10 @@ void tampilkanData()
   }
 
   cout << " ----------------------------------------------------------------------------------------- \n";
-  cout << "  ESTIMASI TOTAL PENGELUARAN (Dalam Rupiah): Rp ";
-  printRupiah(totalEstimasiRupiah);
-  cout << "\n  (Asumsi Kurs $1 = Rp " << nilaiKursDollar << ")\n";
+  cout << "  ESTIMASI TOTAL PENGELUARAN (Dalam Rupiah): Rp " << printRupiah(totalEstimasiRupiah) << "\n";
+  cout << "  (Asumsi Kurs $1 = Rp " << printRupiah(nilaiKursDollar) << ")\n";
   cout << " ----------------------------------------------------------------------------------------- \n";
-
+  
   cout << "\n Tekan Enter...";
   cin.ignore();
   cin.get();
