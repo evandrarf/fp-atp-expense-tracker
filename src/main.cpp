@@ -726,6 +726,12 @@ void hapusData()
   cout << "\n Masukkan nomor data yang ingin dihapus: ";
   cin >> nomorHapus;
 
+  if(nomorHapus < 1)
+  {
+    cout << "[Error] Nomor tidak valid.\n";
+    return;
+  }
+
   struct List *temp = pengeluaran;
   struct List *prev = NULL;
 
