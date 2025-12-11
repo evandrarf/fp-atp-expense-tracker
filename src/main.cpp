@@ -343,20 +343,23 @@ void tambahData(const char *tgl, const char *desc, const char *kat, long long no
 
 string printRupiah(long long number)
 {
-if (number < 0) return "-" + printRupiah(-number);
-    
-    string numStr = to_string(number);
-    string result = "";
-    int count = 0;
-    
-    for (int i = numStr.length() - 1; i >= 0; i--) {
-        result = numStr[i] + result;
-        count++;
-        if (count % 3 == 0 && i > 0) {
-            result = "." + result;
-        }
+  if (number < 0)
+    return "-" + printRupiah(-number);
+
+  string numStr = to_string(number);
+  string result = "";
+  int count = 0;
+
+  for (int i = numStr.length() - 1; i >= 0; i--)
+  {
+    result = numStr[i] + result;
+    count++;
+    if (count % 3 == 0 && i > 0)
+    {
+      result = "." + result;
     }
-    return result;
+  }
+  return result;
 }
 
 void aturKurs()
@@ -383,14 +386,14 @@ void tampilkanData()
     cin.get();
     return;
   }
-  
-  cout << setfill(' '); 
-  
+
+  cout << setfill(' ');
+
   cout << " ----------------------------------------------------------------------------------------- \n";
   cout << "| No | " << left << setw(12) << "TANGGAL"
        << "| " << left << setw(25) << "DESKRIPSI"
        << "| " << left << setw(20) << "KATEGORI"
-       << "| " << right << setw(19) << "NOMINAL" << " |\n"; 
+       << "| " << right << setw(19) << "NOMINAL" << " |\n";
   cout << " ----------------------------------------------------------------------------------------- \n";
 
   struct List *temp = pengeluaran;
@@ -408,32 +411,38 @@ void tampilkanData()
     cout << "| ";
 
     string nominalStr = printRupiah(temp->nominal);
-    
-    int maxLebarNominal = 18; 
+
+    int maxLebarNominal = 18;
 
     if (temp->currency == 1) // IDR
     {
       string idrStr = "Rp " + nominalStr;
-      
-       if (idrStr.length() > maxLebarNominal) {
-           cout << right << setw(maxLebarNominal) << (idrStr.substr(0, maxLebarNominal-3) + "...");
-       } else {
-           cout << right << setw(maxLebarNominal) << idrStr;
-       }
-       cout << "  |";
-       totalEstimasiRupiah += temp->nominal;
+
+      if (idrStr.length() > maxLebarNominal)
+      {
+        cout << right << setw(maxLebarNominal) << (idrStr.substr(0, maxLebarNominal - 3) + "...");
+      }
+      else
+      {
+        cout << right << setw(maxLebarNominal) << idrStr;
+      }
+      cout << "  |";
+      totalEstimasiRupiah += temp->nominal;
     }
     else if (temp->currency == 2) // USD
     {
-       string usdStr = "$ " + nominalStr;
-       
-       if (usdStr.length() > maxLebarNominal) {
-           cout << right << setw(maxLebarNominal) << (usdStr.substr(0, maxLebarNominal-3) + "...");
-       } else {
-           cout << right << setw(maxLebarNominal) << usdStr;
-       }
-       cout << "  |"; // Spasi penutup
-       totalEstimasiRupiah += (temp->nominal * nilaiKursDollar);
+      string usdStr = "$ " + nominalStr;
+
+      if (usdStr.length() > maxLebarNominal)
+      {
+        cout << right << setw(maxLebarNominal) << (usdStr.substr(0, maxLebarNominal - 3) + "...");
+      }
+      else
+      {
+        cout << right << setw(maxLebarNominal) << usdStr;
+      }
+      cout << "  |"; // Spasi penutup
+      totalEstimasiRupiah += (temp->nominal * nilaiKursDollar);
     }
 
     cout << "\n";
@@ -445,7 +454,7 @@ void tampilkanData()
   cout << "  ESTIMASI TOTAL PENGELUARAN (Dalam Rupiah): Rp " << printRupiah(totalEstimasiRupiah) << "\n";
   cout << "  (Asumsi Kurs $1 = Rp " << printRupiah(nilaiKursDollar) << ")\n";
   cout << " ----------------------------------------------------------------------------------------- \n";
-  
+
   cout << "\n Tekan Enter...";
   cin.ignore();
   cin.get();
@@ -726,7 +735,7 @@ void hapusData()
   cout << "\n Masukkan nomor data yang ingin dihapus: ";
   cin >> nomorHapus;
 
-  if(nomorHapus < 1)
+  if (nomorHapus < 1)
   {
     cout << "[Error] Nomor tidak valid.\n";
     return;
@@ -1071,7 +1080,7 @@ void cariData()
       match = true;
     if (pilihan == 2 && strstr(lowKategori, keyword))
       match = true;
-    
+
     if (match)
     {
       ditemukan = true;
@@ -1084,9 +1093,7 @@ void cariData()
 
       if (temp->currency == 1)
       {
-        cout << right << setw(15);
-        printRupiah(temp->nominal);
-        cout << "   |";
+        cout << right << setw(15) << printRupiah(temp->nominal) << "   |";
       }
       else
       {
@@ -1144,9 +1151,12 @@ void bersihkanMemori()
     {
       next = current->next;
 
-      if (current->tanggal != NULL) delete[] current->tanggal;
-      if (current->deskripsi != NULL) delete[] current->deskripsi;
-      if (current->kategori != NULL) delete[] current->kategori;
+      if (current->tanggal != NULL)
+        delete[] current->tanggal;
+      if (current->deskripsi != NULL)
+        delete[] current->deskripsi;
+      if (current->kategori != NULL)
+        delete[] current->kategori;
 
       delete current;
 
@@ -1155,7 +1165,7 @@ void bersihkanMemori()
     }
 
     pengeluaran = NULL;
-    
+
     cout << "\n [SUKSES] Memori telah dibersihkan.\n";
     cout << "          " << jumlahDihapus << " data berhasil dihapus dari memori.\n";
   }
@@ -1452,8 +1462,8 @@ void tambahPengeluaran()
   tambahData(tgl, desc, kat, nominal, currency);
 
   cout << "\n [Sukses] Pengeluaran berhasil ditambahkan!\n";
-    cout << " Tekan Enter...";
-    cin.get();
+  cout << " Tekan Enter...";
+  cin.get();
 }
 
 void toLowerCase(char *str)
@@ -1544,15 +1554,13 @@ void groupingPengeluaranKategori()
 
   for (int i = 0; i < jumlahKategori; i++)
   {
-    cout << left << setw(20) << kategoriList[i] << ": Rp ";
-    printRupiah(totalKategori[i]);
-    cout << "\n";
+    cout << left << setw(20) << kategoriList[i] << ": Rp " << printRupiah(totalKategori[i]) << "\n";
   }
   cout << "\nKurs yang digunakan: $1 = Rp " << nilaiKursDollar << endl;
   cout << "---------------------------------\n";
-   cout << " Tekan Enter...";
-      cin.ignore();
-      cin.get();
+  cout << " Tekan Enter...";
+  cin.ignore();
+  cin.get();
 }
 
 void printPotong(const char *teks, int maxLebar)
@@ -1701,9 +1709,7 @@ void persentaseExpensePerBulan()
     cout << "--------------------------------------------" << endl;
     cout << " " << getNamaBulan(bulan) << " " << tahun << endl;
     cout << "--------------------------------------------" << endl;
-    cout << " Total: Rp ";
-    printRupiah(totalBulan);
-    cout << "\n"
+    cout << " Total: Rp " << printRupiah(totalBulan) << "\n"
          << endl;
 
     // Sort kategori berdasarkan nominal (descending) untuk tampilan
@@ -1735,10 +1741,7 @@ void persentaseExpensePerBulan()
       double persen = (totalBulan > 0) ? ((double)totalKategori[i] / totalBulan) * 100.0 : 0.0;
 
       cout << " " << left << setw(19) << kategoriList[i];
-      cout << "Rp ";
-      // Tampilkan nominal dengan format
-      cout << right << setw(9);
-      printRupiah(totalKategori[i]);
+      cout << "Rp " << right << setw(12) << printRupiah(totalKategori[i]);
       cout << fixed << setprecision(1) << setw(8) << persen << "%";
 
       // Tampilkan bar visual
@@ -1753,7 +1756,7 @@ void persentaseExpensePerBulan()
     cout << endl;
   }
   cout << "============================================" << endl;
-   cout << " Tekan Enter...";
-      cin.ignore();
-      cin.get();
+  cout << " Tekan Enter...";
+  cin.ignore();
+  cin.get();
 }
