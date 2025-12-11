@@ -2,7 +2,7 @@
 
 ## Expense Tracker
 
-### 👥 Class A — Team 1
+### 👥 Class A — Team 2
 
 - **Evandra Raditya Fauzan (5027251001)**
 - **Muhammad Satrio Utomo (5027251022)**
